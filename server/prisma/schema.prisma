@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  username     String    @unique @db.VarChar(32)
+  passwordHash String    @db.VarChar(255)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  trackStats   TrackStat[]
+}
+
+model TrackStat {
+  id             Int      @id @default(autoincrement())
+  ownerId        Int
+  name           String   @db.VarChar(191)
+  updatedAtLabel String   @default("Just now") @db.VarChar(64)
+  level          Int      @default(0)
+  bounty         BigInt   @default(0)
+  beli           BigInt   @default(0)
+  fragments      Int      @default(0)
+  sea            Int      @default(1)
+  tierCur        Int      @default(0)
+  tierMax        Int      @default(10)
+  raceTag        String   @default("Human") @db.VarChar(64)
+  melees         Json
+  awakenedKeys   Json
+  equippedFruit  String   @default("None") @db.VarChar(64)
+  equippedMastery Int     @default(0)
+  legendaryTags  Json
+  mythicalTags   Json
+  pulled         String   @default("Not Pulled") @db.VarChar(32)
+  specialItems   Json
+  online         Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
+}

@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+<html lang="en" class="dark" data-ui-scale="1x">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blox Stats – Comprehensive Dashboard</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#22d3ee",
+            "background-light": "#f1f5f9",
+            "background-dark": "#030712",
+            "accent-cyan": "#22d3ee",
+            "accent-green": "#34d399",
+            "accent-yellow": "#fbbf24",
+            "accent-orange": "#fb923c",
+            "accent-blue": "#38bdf8",
+            "accent-purple": "#a78bfa",
+            "accent-red": "#fb7185"
+          },
+          fontFamily: {
+            sans: ["Inter", "system-ui", "Segoe UI", "sans-serif"],
+            display: ["Inter", "system-ui", "Segoe UI", "sans-serif"],
+            mono: ["Inter", "ui-monospace", "monospace"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          }
+        }
+      }
+    }
+  </script>
+  <script>
+    (function guardDashboardAccess() {
+      const API_BASE = "http://localhost:4000/api";
+      fetch(`${API_BASE}/auth/me`, { credentials: "include" })
+        .then((res) => {
+          if (!res.ok) window.location.replace("login.html");
+        })
+        .catch(() => {
+          window.location.replace("login.html");
+        });
+    })();
+  </script>
+</head>
+<body class="app-body text-slate-100 font-sans min-h-screen antialiased">
+  <div id="pageLoader" class="page-loader" aria-live="polite" aria-label="Loading">
+    <div class="loader-circles">
+      <span class="circle"></span>
+      <span class="circle"></span>
+      <span class="circle"></span>
+      <span class="circle"></span>
+      <span class="circle"></span>
+      <span class="circle"></span>
+    </div>
+  </div>
+  <div class="ambient-layer" aria-hidden="true">
+    <div class="shooting-stars">
+      <span class="shooting-star"></span><span class="shooting-star"></span><span class="shooting-star"></span><span class="shooting-star"></span><span class="shooting-star"></span>
+      <span class="shooting-star"></span><span class="shooting-star"></span><span class="shooting-star"></span><span class="shooting-star"></span><span class="shooting-star"></span>
+      <span class="shooting-star"></span><span class="shooting-star"></span><span class="shooting-star"></span><span class="shooting-star"></span><span class="shooting-star"></span>
+      <span class="shooting-star"></span><span class="shooting-star"></span><span class="shooting-star"></span><span class="shooting-star"></span><span class="shooting-star"></span>
+    </div>
+  </div>
+
+  <div class="app-shell flex min-h-screen min-h-[100dvh] w-full min-w-0 items-stretch">
+  
+  <div class="app-sidebar relative flex h-screen w-[256px] shrink-0 flex-col justify-between border-r border-white/5 p-4 sticky top-0 overflow-y-auto overflow-x-hidden">
+    <div class="sidebar-top-stack flex flex-col gap-8">
+      
+      <div class="flex items-center gap-3 px-2">
+        <img src="file:///C:/frontendtest/3tn.png" alt="Blox Stats Logo" class="h-14 w-14 rounded-lg object-cover logo-glow" />
+        <h2 class="font-brand text-xl font-extrabold tracking-tight text-gradient-brand">Blox Stats</h2>
+      </div>
+      
+      
+      <nav class="flex flex-col gap-2">
+        <a class="nav-link nav-link--active group flex items-center gap-3 px-3 py-2.5 rounded-lg bg-accent-cyan/10 text-accent-cyan font-medium hover:bg-accent-cyan/20" href="#dashboard">
+          <span class="material-symbols-outlined transition-transform duration-300 ease-out group-hover:scale-110">dashboard</span>
+          Dashboard
+        </a>
+      </nav>
+
+      
+      <div>
+        <div class="px-3 py-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+          <span>Your Games</span>
+        </div>
+        <div class="space-y-1">
+          <a href="#" class="game-row game-row--active flex items-center gap-3 px-3 py-2.5 rounded-lg bg-accent-cyan/10 text-accent-cyan font-medium">
+            <span class="text-lg" aria-hidden="true">🏝️</span>
+            <span class="truncate text-sm">Blox Fruits</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-footer flex flex-col gap-4 border-t border-white/10 pt-4">
+      <button type="button" id="logoutBtn" class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-white/5">
+        <span class="material-symbols-outlined">logout</span>
+        Logout
+      </button>
+      <div class="profile-card flex items-center gap-3 p-3 rounded-xl border">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-accent-purple/40 to-accent-cyan/30 border-2 border-accent-cyan/60 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-lg shadow-accent-purple/20">D</div>
+        <div class="flex flex-col overflow-hidden">
+          <span class="text-sm font-bold text-white truncate">dtctho</span>
+          <span class="text-xs text-slate-400 truncate">Premium Member</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="flex min-h-0 min-w-0 flex-1 flex-col self-stretch overflow-hidden">
+    
+    <header id="mainHeader" class="app-header dashboard-header flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-4 py-4 sm:px-6 sm:py-5 lg:px-8 xl:px-10 2xl:px-12 sticky top-0 z-20">
+      <div>
+        <h1 class="font-brand text-2xl font-bold text-white tracking-tight">Dashboard</h1>
+        <p class="text-sm text-slate-400 mt-1">Welcome back, dtctho. Track your Blox Fruits progress.</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+        <div class="relative min-w-0 max-w-full sm:max-w-sm">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-[18px]">search</span>
+          <input class="input-smooth w-full max-w-full rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-accent-cyan sm:w-64 text-white placeholder-slate-500" placeholder="Search accounts..." type="text">
+        </div>
+        <div class="ui-scale-control flex flex-wrap items-center gap-1.5 rounded-lg border border-white/10 bg-slate-950/60 px-1.5 py-1 sm:gap-2 sm:px-2" title="Auto: gọn 75% + khoảng cách tối ưu. 1×: cỡ chuẩn.">
+          <span class="material-symbols-outlined hidden shrink-0 text-slate-500 text-[18px] sm:inline" aria-hidden="true">photo_size_select_small</span>
+          <div class="ui-scale-segment flex min-w-0" role="group" aria-label="Tỷ lệ giao diện">
+            <button type="button" data-ui-mode="auto" class="ui-scale-btn">Auto</button>
+            <button type="button" data-ui-mode="1x" class="ui-scale-btn">1×</button>
+          </div>
+        </div>
+        <button type="button" class="btn-icon relative rounded-xl p-2.5 text-slate-400">
+          <span class="material-symbols-outlined">notifications</span>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+        </button>
+      </div>
+    </header>
+
+    
+    <main id="mainScroll" class="main-dashboard flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden scroll-smooth">
+      <div class="dashboard-inner flex w-full max-w-none flex-1 flex-col gap-8 min-w-0 px-4 py-6 sm:px-6 sm:py-8 lg:px-8 xl:px-10 2xl:px-12">
+        
+        <div class="reveal-stagger metrics-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <div class="reveal-item card-interactive relative overflow-hidden rounded-2xl border border-white/10 p-6 flex flex-col gap-4 transition-colors group">
+            <div class="absolute -right-8 -top-8 text-accent-cyan/5 text-8xl group-hover:text-accent-cyan/10 transition-colors">
+              <span class="material-symbols-outlined">military_tech</span>
+            </div>
+            <div class="relative z-10">
+              <div class="flex items-center gap-2 mb-2 text-slate-400 text-xs">
+                <span class="material-symbols-outlined text-sm">trending_up</span>
+                <span class="font-medium uppercase tracking-wider">Average Level</span>
+              </div>
+              <h3 class="text-4xl font-bold text-white stat-value">2,550</h3>
+              <div class="mt-4 space-y-2">
+                <div class="flex justify-between text-xs text-slate-400">
+                  <span>Avg. vs max cap</span>
+                  <span>100%</span>
+                </div>
+                <div class="stat-bar-track h-1.5 w-full bg-slate-900/80 rounded-full overflow-hidden">
+                  <div class="h-full bg-accent-cyan rounded-full" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          
+          <div class="reveal-item card-interactive relative overflow-hidden rounded-2xl border border-white/10 p-6 flex flex-col gap-4 transition-colors group">
+            <div class="absolute -right-8 -top-8 text-accent-red/5 text-8xl group-hover:text-accent-red/10 transition-colors">
+              <span class="material-symbols-outlined">local_police</span>
+            </div>
+            <div class="relative z-10">
+              <div class="flex items-center gap-2 mb-2 text-slate-400 text-xs">
+                <span class="material-symbols-outlined text-sm">stars</span>
+                <span class="font-medium uppercase tracking-wider">Total Bounty</span>
+              </div>
+              <h3 class="text-4xl font-bold text-white stat-value">233,724,867</h3>
+              <div class="mt-4 flex items-center gap-2">
+                <span class="px-2 py-1 bg-accent-red/20 text-accent-red text-xs font-bold rounded">PIRATE</span>
+                <span class="text-xs text-slate-400">Rank: 1</span>
+              </div>
+            </div>
+          </div>
+
+          
+          <div class="reveal-item card-interactive relative overflow-hidden rounded-2xl border border-white/10 p-6 flex flex-col gap-4 transition-colors group">
+            <div class="absolute -right-8 -top-8 text-accent-purple/5 text-8xl group-hover:text-accent-purple/10 transition-colors">
+              <span class="material-symbols-outlined">monetization_on</span>
+            </div>
+            <div class="relative z-10">
+              <div class="flex items-center gap-2 mb-2 text-slate-400 text-xs">
+                <span class="material-symbols-outlined text-sm">monetization_on</span>
+                <span class="font-medium uppercase tracking-wider">Total Beli</span>
+              </div>
+              <h3 class="text-3xl font-bold text-accent-purple stat-value">1,488,838</h3>
+              <p class="text-xs text-slate-400 mt-2">Total</p>
+            </div>
+          </div>
+
+          
+          <div class="reveal-item card-interactive relative overflow-hidden rounded-2xl border border-white/10 p-6 flex flex-col gap-4 transition-colors group">
+            <div class="absolute -right-8 -top-8 text-accent-green/5 text-8xl group-hover:text-accent-green/10 transition-colors">
+              <span class="material-symbols-outlined">diamond</span>
+            </div>
+            <div class="relative z-10">
+              <div class="flex items-center gap-2 mb-2 text-slate-400 text-xs">
+                <span class="material-symbols-outlined text-sm">diamond</span>
+                <span class="font-medium uppercase tracking-wider">Total Fragments</span>
+              </div>
+              <h3 class="text-3xl font-bold text-accent-green stat-value">1,205</h3>
+              <p class="text-xs text-slate-400 mt-2">Total</p>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="reveal combat-loadout-grid grid grid-cols-1 gap-8">
+          <div class="panel-card rounded-2xl border border-white/10 p-6">
+            <div class="flex items-center justify-between mb-6">
+              <h3 class="font-brand text-lg font-bold text-white tracking-tight">Stats</h3>
+            </div>
+            <div class="combat-stat-cards reveal-stagger grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
+              
+              <div class="reveal-item card-interactive relative overflow-hidden rounded-2xl border border-white/10 p-4 flex flex-col gap-3 transition-colors group min-h-[13rem]">
+                <div class="absolute -right-5 -top-5 text-accent-red/10 text-7xl group-hover:text-accent-red/[0.14] transition-colors pointer-events-none">
+                  <span class="material-symbols-outlined">trending_up</span>
+                </div>
+                <div class="relative z-10 flex flex-col flex-1">
+                  <div class="stat-card-head">
+                    <div class="stat-card-media">
+                    <span class="stat-card-icon-slot">
+                      <span class="material-symbols-outlined text-[22px] leading-none text-accent-red">trending_up</span>
+                    </span>
+                    </div>
+                    <span class="stat-card-name">MaxLevel</span>
+                  </div>
+                  <h4 class="stat-card-ratio text-2xl sm:text-3xl font-bold text-white stat-value tabular-nums">2,550 <span class="text-lg text-slate-300 font-normal">/ 2,550</span></h4>
+                  <div class="mt-auto pt-4 space-y-2">
+                    <div class="flex justify-between text-xs text-slate-400">
+                      <span>Cap progress</span>
+                      <span>100%</span>
+                    </div>
+                    <div class="stat-bar-track h-1.5 w-full bg-slate-900/80 rounded-full overflow-hidden">
+                      <div class="h-full bg-accent-red rounded-full" style="width: 100%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="reveal-item card-interactive relative overflow-hidden rounded-2xl border border-white/10 p-4 flex flex-col gap-3 transition-colors group min-h-[13rem]">
+                <div class="absolute -right-5 -top-5 text-accent-blue/10 text-7xl group-hover:text-accent-blue/[0.14] transition-colors pointer-events-none">
+                  <span class="material-symbols-outlined">sports_martial_arts</span>
+                </div>
+                <div class="relative z-10 flex flex-col flex-1">
+                  <div class="stat-card-head">
+                    <div class="stat-card-media">
+                    <span class="stat-card-icon-slot">
+                      <span class="material-symbols-outlined text-[22px] leading-none text-accent-blue">sports_martial_arts</span>
+                    </span>
+                    </div>
+                    <span class="stat-card-name">GodHuman</span>
+                  </div>
+                  <h4 class="stat-card-ratio text-2xl sm:text-3xl font-bold text-white stat-value tabular-nums">2,550 <span class="text-lg text-slate-300 font-normal">/ 2,550</span></h4>
+                  <div class="mt-auto pt-4 space-y-2">
+                    <div class="flex justify-between text-xs text-slate-400">
+                      <span>Cap progress</span>
+                      <span>100%</span>
+                    </div>
+                    <div class="stat-bar-track h-1.5 w-full bg-slate-900/80 rounded-full overflow-hidden">
+                      <div class="h-full bg-accent-blue rounded-full" style="width: 100%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="reveal-item card-interactive relative overflow-hidden rounded-2xl border border-white/10 p-4 flex flex-col gap-3 transition-colors group min-h-[13rem]">
+                <div class="absolute -right-5 -top-5 text-accent-purple/10 text-7xl group-hover:text-accent-purple/[0.14] transition-colors pointer-events-none">
+                  <span class="material-symbols-outlined">swords</span>
+                </div>
+                <div class="relative z-10 flex flex-col flex-1">
+                  <div class="stat-card-head">
+                    <div class="stat-card-media">
+                    <span class="stat-card-icon-slot">
+                      <span class="material-symbols-outlined text-[22px] leading-none text-accent-purple">swords</span>
+                    </span>
+                    </div>
+                    <span class="stat-card-name">CDK</span>
+                  </div>
+                  <h4 class="stat-card-ratio text-2xl sm:text-3xl font-bold text-white stat-value tabular-nums">2,548 <span class="text-lg text-slate-300 font-normal">/ 2,550</span></h4>
+                  <div class="mt-auto pt-4 space-y-2">
+                    <div class="flex justify-between text-xs text-slate-400">
+                      <span>Cap progress</span>
+                      <span>99%</span>
+                    </div>
+                    <div class="stat-bar-track h-1.5 w-full bg-slate-900/80 rounded-full overflow-hidden">
+                      <div class="h-full bg-accent-purple rounded-full" style="width: 99%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="reveal-item card-interactive relative overflow-hidden rounded-2xl border border-white/10 p-4 flex flex-col gap-3 transition-colors group min-h-[13rem]">
+                <div class="absolute -right-5 -top-5 text-sky-400/15 text-7xl group-hover:text-sky-400/25 transition-colors pointer-events-none">
+                  <span class="material-symbols-outlined">blur_on</span>
+                </div>
+                <div class="relative z-10 flex flex-col flex-1">
+                  <div class="stat-card-head">
+                    <div class="stat-card-media">
+                    <span class="stat-card-icon-slot">
+                      <span class="material-symbols-outlined text-[22px] leading-none text-sky-400">blur_on</span>
+                    </span>
+                    </div>
+                    <span class="stat-card-name">Mir</span>
+                  </div>
+                  <h4 class="stat-card-ratio text-2xl sm:text-3xl font-bold text-white stat-value tabular-nums">1 <span class="text-lg text-slate-300 font-normal">/ 2,550</span></h4>
+                  <div class="mt-auto pt-4 space-y-2">
+                    <div class="flex justify-between text-xs text-slate-400">
+                      <span>Cap progress</span>
+                      <span>~0%</span>
+                    </div>
+                    <div class="stat-bar-track h-1.5 w-full bg-slate-900/80 rounded-full overflow-hidden">
+                      <div class="h-full bg-sky-400 rounded-full" style="width: 2%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="reveal-item card-interactive relative overflow-hidden rounded-2xl border border-white/10 p-4 flex flex-col gap-3 transition-colors group min-h-[13rem]">
+                <div class="absolute -right-5 -top-5 text-accent-orange/15 text-7xl group-hover:text-accent-orange/25 transition-colors pointer-events-none">
+                  <span class="material-symbols-outlined">bolt</span>
+                </div>
+                <div class="relative z-10 flex flex-col flex-1">
+                  <div class="stat-card-head">
+                    <div class="stat-card-media">
+                    <span class="stat-card-icon-slot">
+                      <span class="material-symbols-outlined text-[22px] leading-none text-accent-orange">bolt</span>
+                    </span>
+                    </div>
+                    <span class="stat-card-name">Val</span>
+                  </div>
+                  <h4 class="stat-card-ratio text-2xl sm:text-3xl font-bold text-white stat-value tabular-nums">1 <span class="text-lg text-slate-300 font-normal">/ 2,550</span></h4>
+                  <div class="mt-auto pt-4 space-y-2">
+                    <div class="flex justify-between text-xs text-slate-400">
+                      <span>Cap progress</span>
+                      <span>~0%</span>
+                    </div>
+                    <div class="stat-bar-track h-1.5 w-full bg-slate-900/80 rounded-full overflow-hidden">
+                      <div class="h-full bg-accent-orange rounded-full" style="width: 2%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="reveal-item card-interactive relative overflow-hidden rounded-2xl border border-white/10 p-4 flex flex-col gap-3 transition-colors group min-h-[13rem]">
+                <div class="absolute -right-5 -top-5 text-accent-red/15 text-7xl group-hover:text-accent-red/25 transition-colors pointer-events-none">
+                  <span class="material-symbols-outlined">water_drop</span>
+                </div>
+                <div class="relative z-10 flex flex-col flex-1">
+                  <div class="stat-card-head">
+                    <div class="stat-card-media">
+                    <span class="stat-card-icon-slot">
+                      <span class="material-symbols-outlined text-[22px] leading-none text-accent-red">water_drop</span>
+                    </span>
+                    </div>
+                    <span class="stat-card-name">Saguine</span>
+                  </div>
+                  <h4 class="stat-card-ratio text-2xl sm:text-3xl font-bold text-white stat-value tabular-nums">0 <span class="text-lg text-slate-300 font-normal">/ 2,550</span></h4>
+                  <div class="mt-auto pt-4 space-y-2">
+                    <div class="flex justify-between text-xs text-slate-400">
+                      <span>Cap progress</span>
+                      <span>0%</span>
+                    </div>
+                    <div class="stat-bar-track h-1.5 w-full bg-slate-900/80 rounded-full overflow-hidden">
+                      <div class="h-full bg-accent-red rounded-full" style="width: 0%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="reveal-item card-interactive relative overflow-hidden rounded-2xl border border-white/10 p-4 flex flex-col gap-3 transition-colors group min-h-[13rem]">
+                <div class="absolute -right-5 -top-5 text-cyan-300/15 text-7xl group-hover:text-cyan-300/25 transition-colors pointer-events-none">
+                  <span class="material-symbols-outlined">anchor</span>
+                </div>
+                <div class="relative z-10 flex flex-col flex-1">
+                  <div class="stat-card-head">
+                    <div class="stat-card-media">
+                    <span class="stat-card-icon-slot">
+                      <span class="material-symbols-outlined text-[22px] leading-none text-cyan-300">anchor</span>
+                    </span>
+                    </div>
+                    <span class="stat-card-name">Shark Anchor</span>
+                  </div>
+                  <h4 class="stat-card-ratio text-2xl sm:text-3xl font-bold text-white stat-value tabular-nums">1,420 <span class="text-lg text-slate-300 font-normal">/ 2,550</span></h4>
+                  <div class="mt-auto pt-4 space-y-2">
+                    <div class="flex justify-between text-xs text-slate-400">
+                      <span>Cap progress</span>
+                      <span>56%</span>
+                    </div>
+                    <div class="stat-bar-track h-1.5 w-full bg-slate-900/80 rounded-full overflow-hidden">
+                      <div class="h-full bg-cyan-300 rounded-full" style="width: 56%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="reveal-item card-interactive relative overflow-hidden rounded-2xl border border-white/10 p-4 flex flex-col gap-3 transition-colors group min-h-[13rem]">
+                <div class="absolute -right-5 -top-5 text-purple-300/15 text-7xl group-hover:text-purple-300/25 transition-colors pointer-events-none">
+                  <span class="material-symbols-outlined">music_note</span>
+                </div>
+                <div class="relative z-10 flex flex-col flex-1">
+                  <div class="stat-card-head">
+                    <div class="stat-card-media">
+                    <span class="stat-card-icon-slot">
+                      <span class="material-symbols-outlined text-[22px] leading-none text-purple-300">music_note</span>
+                    </span>
+                    </div>
+                    <span class="stat-card-name">Skull Guitar</span>
+                  </div>
+                  <h4 class="stat-card-ratio text-2xl sm:text-3xl font-bold text-white stat-value tabular-nums">2,010 <span class="text-lg text-slate-300 font-normal">/ 2,550</span></h4>
+                  <div class="mt-auto pt-4 space-y-2">
+                    <div class="flex justify-between text-xs text-slate-400">
+                      <span>Cap progress</span>
+                      <span>79%</span>
+                    </div>
+                    <div class="stat-bar-track h-1.5 w-full bg-slate-900/80 rounded-full overflow-hidden">
+                      <div class="h-full bg-purple-300 rounded-full" style="width: 79%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal quick-actions-bar rounded-xl border border-white/10 px-3 py-2.5 sm:px-4">
+          <div class="quick-actions-inner flex flex-wrap items-center justify-between gap-2.5">
+            <div class="quick-status-group inline-flex items-center gap-2" role="group" aria-label="Quick status filter">
+              <button type="button" class="quick-status-btn is-active">
+                <span class="quick-status-dot"></span>
+                <span>All</span>
+              </button>
+              <button type="button" class="quick-status-btn">
+                <span class="quick-status-dot"></span>
+                <span>Online</span>
+              </button>
+              <button type="button" class="quick-status-btn">
+                <span class="quick-status-dot"></span>
+                <span>Offline</span>
+              </button>
+            </div>
+            <div class="quick-actions-group inline-flex flex-wrap items-center gap-2">
+              <button type="button" class="quick-action-btn">
+                <span class="material-symbols-outlined">open_in_new</span>
+                <span>Export Data</span>
+              </button>
+              <button type="button" class="quick-action-btn">
+                <span class="material-symbols-outlined">description</span>
+                <span>Google Sheets</span>
+              </button>
+              <button type="button" class="quick-action-btn">
+                <span class="material-symbols-outlined">content_copy</span>
+                <span>Script</span>
+              </button>
+              <button type="button" class="quick-action-btn">
+                <span class="material-symbols-outlined">upload</span>
+                <span>Cookies</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="reveal panel-card tracked-accounts-panel rounded-2xl border border-white/10 overflow-hidden">
+          <div class="px-4 pt-3 sm:px-6">
+            <p id="trackedAccountTotal" class="text-xs font-semibold uppercase tracking-wide text-slate-400">0 accounts tracked</p>
+          </div>
+          <div class="px-4 py-4 sm:px-6 sm:py-5 border-b border-white/10 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <h3 id="trackedAccountsTitle" class="font-brand text-2xl sm:text-[2.15rem] font-bold text-white tracking-tight">Tracked Accounts</h3>
+              <span id="trackedAccountCount" class="px-3 py-1 bg-accent-cyan/10 border border-accent-cyan/25 text-accent-cyan text-xs font-bold rounded-full tabular-nums">30 items</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+              <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Pagination">
+                <button type="button" id="accountPagePrev" class="account-page-btn inline-flex items-center justify-center rounded-none border border-white/12 bg-white/5 px-2 py-2 text-slate-300 hover:border-accent-cyan/35 hover:bg-accent-cyan/10 hover:text-accent-cyan disabled:opacity-35 disabled:pointer-events-none" aria-label="Previous page">
+                  <span class="material-symbols-outlined text-[20px]">chevron_left</span>
+                </button>
+                <span id="accountPageIndicator" class="min-w-[7rem] px-2 text-center text-xs font-semibold tabular-nums text-slate-400">—</span>
+                <button type="button" id="accountPageNext" class="account-page-btn inline-flex items-center justify-center rounded-none border border-white/12 bg-white/5 px-2 py-2 text-slate-300 hover:border-accent-cyan/35 hover:bg-accent-cyan/10 hover:text-accent-cyan disabled:opacity-35 disabled:pointer-events-none" aria-label="Next page">
+                  <span class="material-symbols-outlined text-[20px]">chevron_right</span>
+                </button>
+              </div>
+              <select id="accountPageSize" class="input-smooth account-toolbar-select rounded-none px-3 py-2 text-sm text-white" aria-label="Accounts per page">
+                <option value="all" selected>All accounts</option>
+                <option value="10">10 per page</option>
+                <option value="25">25 per page</option>
+                <option value="50">50 per page</option>
+                <option value="100">100 per page</option>
+                <option value="250">250 per page</option>
+                <option value="500">500 per page</option>
+              </select>
+              <div class="filter-toolbar-toggle flex items-center gap-2 border-l border-white/10 pl-2 sm:pl-3">
+                <span class="text-[15px] font-semibold uppercase tracking-wide text-slate-500 whitespace-nowrap">Filter</span>
+                <div class="filter-segment filter-segment--compact flex rounded-none border border-white/10" role="group" aria-label="Show filters">
+                  <button type="button" class="filter-seg-btn" data-filter-group="panel" data-value="yes">Yes</button>
+                  <button type="button" class="filter-seg-btn is-active" data-filter-group="panel" data-value="no">No</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="accountFiltersPanel" class="account-filters hidden">
+            <div class="account-filters-inner px-3 py-3 sm:px-5 sm:py-4">
+            
+            <div class="account-filter-row account-filter-row--top flex flex-wrap items-center gap-x-5 gap-y-3 pb-3">
+              <div class="relative min-w-0 flex-[1_1_220px] max-w-lg">
+                <span class="material-symbols-outlined pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-[18px]">search</span>
+                <input type="search" id="filterUsername" autocomplete="off" placeholder="Search username…" class="account-filter-search w-full" />
+              </div>
+              <div class="filter-field flex flex-wrap items-center gap-2.5">
+                <span class="filter-field-label">Status</span>
+                <div class="filter-segment flex rounded-none border border-white/10" role="group" aria-label="Online status">
+                  <button type="button" class="filter-seg-btn is-active" data-filter-group="status" data-value="all">All</button>
+                  <button type="button" class="filter-seg-btn" data-filter-group="status" data-value="online">Online</button>
+                  <button type="button" class="filter-seg-btn" data-filter-group="status" data-value="offline">Offline</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="account-filter-row account-filter-ranges flex flex-wrap items-end gap-x-5 gap-y-3 border-t border-white/[0.06] pt-3">
+              <label class="filter-range-group">
+                <span class="filter-range-label">Level</span>
+                <div class="filter-range-pair">
+                  <input type="number" id="filterLevelMin" class="filter-range-input" placeholder="min" min="0" step="1" />
+                  <span class="filter-range-dash">—</span>
+                  <input type="number" id="filterLevelMax" class="filter-range-input" placeholder="max" min="0" step="1" />
+                </div>
+              </label>
+              <label class="filter-range-group">
+                <span class="filter-range-label">Bounty</span>
+                <div class="filter-range-pair">
+                  <input type="number" id="filterBountyMin" class="filter-range-input" placeholder="min" min="0" step="1000" />
+                  <span class="filter-range-dash">—</span>
+                  <input type="number" id="filterBountyMax" class="filter-range-input" placeholder="max" min="0" step="1000" />
+                </div>
+              </label>
+              <label class="filter-range-group">
+                <span class="filter-range-label">Beli</span>
+                <div class="filter-range-pair">
+                  <input type="number" id="filterBeliMin" class="filter-range-input" placeholder="min" min="0" step="1000" />
+                  <span class="filter-range-dash">—</span>
+                  <input type="number" id="filterBeliMax" class="filter-range-input" placeholder="max" min="0" step="1000" />
+                </div>
+              </label>
+              <label class="filter-range-group">
+                <span class="filter-range-label">Fragments</span>
+                <div class="filter-range-pair">
+                  <input type="number" id="filterFragmentsMin" class="filter-range-input" placeholder="min" min="0" step="1" />
+                  <span class="filter-range-dash">—</span>
+                  <input type="number" id="filterFragmentsMax" class="filter-range-input" placeholder="max" min="0" step="1" />
+                </div>
+              </label>
+            </div>
+            
+            <div class="account-filter-row account-filter-row--actions flex flex-wrap items-end justify-between gap-x-5 gap-y-3 border-t border-white/[0.06] pt-3 mt-1">
+              <div class="flex flex-wrap items-end gap-x-5 gap-y-2.5">
+                <label class="filter-range-group">
+                  <span class="filter-range-label">Legendary fruits</span>
+                  <div class="filter-range-pair">
+                    <input type="number" id="filterLegMin" class="filter-range-input" placeholder="min" min="0" step="1" />
+                    <span class="filter-range-dash">—</span>
+                    <input type="number" id="filterLegMax" class="filter-range-input" placeholder="max" min="0" step="1" />
+                  </div>
+                </label>
+                <label class="filter-range-group">
+                  <span class="filter-range-label">Mythical fruits</span>
+                  <div class="filter-range-pair">
+                    <input type="number" id="filterMythMin" class="filter-range-input" placeholder="min" min="0" step="1" />
+                    <span class="filter-range-dash">—</span>
+                    <input type="number" id="filterMythMax" class="filter-range-input" placeholder="max" min="0" step="1" />
+                  </div>
+                </label>
+              </div>
+              <div class="account-filter-actions flex flex-wrap items-center gap-2 sm:ml-auto">
+                <button type="button" id="filterFindBtn" class="filter-btn-find inline-flex items-center gap-1.5 rounded-none border border-accent-cyan/40 bg-accent-cyan/15 px-4 py-2 text-xs font-bold uppercase tracking-wide text-accent-cyan shadow-[0_0_20px_rgba(34,211,238,0.12)] hover:bg-accent-cyan/25">
+                  <span class="material-symbols-outlined text-[18px]">manage_search</span>
+                  Find
+                </button>
+                <button type="button" id="filterResetBtn" class="rounded-none border border-white/12 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-300 hover:border-white/20 hover:bg-white/10 hover:text-white">Clear</button>
+              </div>
+            </div>
+            </div>
+          </div>
+
+          <div id="accountBulkActions" class="account-bulk-actions hidden" aria-live="polite">
+            <button type="button" class="account-bulk-btn account-bulk-btn--danger" data-bulk-action="delete">
+              <span class="material-symbols-outlined" aria-hidden="true">cancel</span>
+              <span>Delete</span>
+              <span class="account-bulk-count" id="bulkCountDelete">0</span>
+            </button>
+            <button type="button" class="account-bulk-btn account-bulk-btn--danger" data-bulk-action="delete-cookies">
+              <span class="material-symbols-outlined" aria-hidden="true">cookie</span>
+              <span>Delete Cookies</span>
+              <span class="account-bulk-count" id="bulkCountDeleteCookies">0</span>
+            </button>
+            <button type="button" class="account-bulk-btn" data-bulk-action="google-sheets">
+              <span class="material-symbols-outlined" aria-hidden="true">description</span>
+              <span>Google Sheets</span>
+              <span class="account-bulk-count" id="bulkCountGoogleSheets">0</span>
+            </button>
+            <button type="button" class="account-bulk-btn" data-bulk-action="cookies">
+              <span class="material-symbols-outlined" aria-hidden="true">download</span>
+              <span>Cookies</span>
+              <span class="account-bulk-count" id="bulkCountCookies">0</span>
+            </button>
+          </div>
+
+          <div class="accounts-table-scroll tracked-table-wrap overflow-x-auto overflow-y-visible">
+            <table class="table-shell tracked-table w-full text-base">
+              <thead class="sticky top-0 z-[1]">
+                <tr class="border-b border-white/10 bg-slate-950/95 backdrop-blur-md">
+                  <th class="tracked-th-check w-11 px-2 py-3.5 text-center text-xs font-bold uppercase tracking-wide text-slate-500">
+                    <input id="accountSelectAll" type="checkbox" class="acc-select-all h-4 w-4 rounded border-white/20 bg-slate-900 accent-cyan" aria-label="Select all visible accounts" />
+                  </th>
+                  <th class="px-3 py-3.5 text-left">
+                    <span class="tracked-th-title">Info</span>
+                  </th>
+                  <th class="px-3 py-3.5 text-left">
+                    <span class="tracked-th-title">Stats</span>
+                  </th>
+                  <th class="px-3 py-3.5 text-left">
+                    <button type="button" class="tracked-th-filter-btn" data-col-filter="race" aria-label="Filter Race">
+                      <span class="tracked-th-text">Race</span>
+                      <span class="material-symbols-outlined tracked-th-filter-icon" aria-hidden="true">filter_alt</span>
+                    </button>
+                  </th>
+                  <th class="px-3 py-3.5 text-left">
+                    <button type="button" class="tracked-th-filter-btn" data-col-filter="tier" aria-label="Filter Tier">
+                      <span class="tracked-th-text">Tier</span>
+                      <span class="material-symbols-outlined tracked-th-filter-icon" aria-hidden="true">filter_alt</span>
+                    </button>
+                  </th>
+                  <th class="px-3 py-3.5 text-left">
+                    <button type="button" class="tracked-th-filter-btn" data-col-filter="melees" aria-label="Filter Melees">
+                      <span class="tracked-th-text">Melees</span>
+                      <span class="material-symbols-outlined tracked-th-filter-icon" aria-hidden="true">filter_alt</span>
+                    </button>
+                  </th>
+                  <th class="px-3 py-3.5 text-left">
+                    <button type="button" class="tracked-th-filter-btn" data-col-filter="awakened" aria-label="Filter Awakened">
+                      <span class="tracked-th-text">Awakened</span>
+                      <span class="material-symbols-outlined tracked-th-filter-icon" aria-hidden="true">filter_alt</span>
+                    </button>
+                  </th>
+                  <th class="px-3 py-3.5 text-left">
+                    <button type="button" class="tracked-th-filter-btn" data-col-filter="equipped" aria-label="Filter Equipped Fruit">
+                      <span class="tracked-th-text">Equipped</span>
+                      <span class="material-symbols-outlined tracked-th-filter-icon" aria-hidden="true">filter_alt</span>
+                    </button>
+                  </th>
+                  <th class="px-3 py-3.5 text-left">
+                    <button type="button" class="tracked-th-filter-btn" data-col-filter="legendary" aria-label="Filter Legendary">
+                      <span class="tracked-th-text">Legendary</span>
+                      <span class="material-symbols-outlined tracked-th-filter-icon" aria-hidden="true">filter_alt</span>
+                    </button>
+                  </th>
+                  <th class="px-3 py-3.5 text-left">
+                    <button type="button" class="tracked-th-filter-btn" data-col-filter="mythical" aria-label="Filter Mythical">
+                      <span class="tracked-th-text">Mythical</span>
+                      <span class="material-symbols-outlined tracked-th-filter-icon" aria-hidden="true">filter_alt</span>
+                    </button>
+                  </th>
+                  <th class="px-3 py-3.5 text-left">
+                    <button type="button" class="tracked-th-filter-btn" data-col-filter="pulled" aria-label="Filter Pulled">
+                      <span class="tracked-th-text">Pulled</span>
+                      <span class="material-symbols-outlined tracked-th-filter-icon" aria-hidden="true">filter_alt</span>
+                    </button>
+                  </th>
+                  <th class="px-3 py-3.5 text-left">
+                    <button type="button" class="tracked-th-filter-btn" data-col-filter="special" aria-label="Filter Special">
+                      <span class="tracked-th-text">Special</span>
+                      <span class="material-symbols-outlined tracked-th-filter-icon" aria-hidden="true">filter_alt</span>
+                    </button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="accountTable" class="divide-y divide-white/5">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  </div>
+
+  
+  <div id="trackedFilterModal" class="tracked-filter-modal hidden" role="dialog" aria-modal="true" aria-label="Column filter">
+    <div class="tracked-filter-modal-inner">
+      <button type="button" id="trackedFilterClose" class="tracked-filter-close" aria-label="Close">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <div id="trackedFilterPanelRace" class="tracked-filter-panel hidden" data-panel="race">
+        <div class="tracked-filter-head">
+          <h2 id="trackedFilterTitleRace" class="tracked-filter-title">Filter by Race</h2>
+        </div>
+        <div class="tracked-filter-input-wrap tracked-filter-input-wrap--light">
+          <label class="tracked-filter-floating-label" for="trackedFilterRaceInput">Search</label>
+          <input id="trackedFilterRaceInput" type="search" class="tracked-filter-input tracked-filter-input--light" placeholder="Search races…" autocomplete="off" />
+        </div>
+        <div id="trackedFilterRaceList" class="tracked-filter-list tracked-filter-list--scroll"></div>
+        <div class="tracked-filter-footer">
+          <button type="button" class="tracked-filter-clear" data-clear="race">
+            <span class="material-symbols-outlined">ink_eraser</span> Clear All
+          </button>
+        </div>
+      </div>
+
+      <div id="trackedFilterPanelTier" class="tracked-filter-panel hidden" data-panel="tier">
+        <div class="tracked-filter-head">
+          <h2 class="tracked-filter-title">Filter by Tier</h2>
+        </div>
+        <div class="tracked-filter-input-wrap tracked-filter-input-wrap--light">
+          <label class="tracked-filter-floating-label" for="trackedFilterTierInput">Search</label>
+          <input id="trackedFilterTierInput" type="search" class="tracked-filter-input tracked-filter-input--light" placeholder="Search tier (1–10)…" autocomplete="off" />
+        </div>
+        <div id="trackedFilterTierList" class="tracked-filter-list tracked-filter-list--tiergrid"></div>
+        <div class="tracked-filter-footer">
+          <button type="button" class="tracked-filter-clear" data-clear="tier">
+            <span class="material-symbols-outlined">ink_eraser</span> Clear All
+          </button>
+        </div>
+      </div>
+
+      <div id="trackedFilterPanelMelees" class="tracked-filter-panel hidden" data-panel="melees">
+        <div class="tracked-filter-head">
+          <h2 id="trackedFilterTitleMelees" class="tracked-filter-title">Filter by Melees</h2>
+        </div>
+        <div class="tracked-filter-input-wrap tracked-filter-input-wrap--light">
+          <label class="tracked-filter-floating-label" for="trackedFilterMeleesInput">Search</label>
+          <input id="trackedFilterMeleesInput" type="search" class="tracked-filter-input tracked-filter-input--light" placeholder="Search melees…" autocomplete="off" />
+        </div>
+        <div id="trackedFilterMeleesList" class="tracked-filter-list tracked-filter-list--scroll"></div>
+        <div class="tracked-filter-footer">
+          <button type="button" class="tracked-filter-clear" data-clear="melees">
+            <span class="material-symbols-outlined">ink_eraser</span> Clear All
+          </button>
+        </div>
+      </div>
+
+      <div id="trackedFilterPanelAwakened" class="tracked-filter-panel hidden" data-panel="awakened">
+        <div class="tracked-filter-head">
+          <h2 id="trackedFilterTitleAwakened" class="tracked-filter-title">Filter by Awakened Skills</h2>
+        </div>
+        <div class="tracked-filter-input-wrap tracked-filter-input-wrap--light">
+          <label class="tracked-filter-floating-label" for="trackedFilterAwakenedInput">Search</label>
+          <input id="trackedFilterAwakenedInput" type="search" class="tracked-filter-input tracked-filter-input--light" placeholder="Search Z, X, C…" autocomplete="off" />
+        </div>
+        <div id="trackedFilterAwakenedList" class="tracked-filter-list tracked-filter-list--awakened"></div>
+        <div class="tracked-filter-footer">
+          <button type="button" class="tracked-filter-clear" data-clear="awakened">
+            <span class="material-symbols-outlined">ink_eraser</span> Clear All
+          </button>
+        </div>
+      </div>
+
+      <div id="trackedFilterPanelLegendary" class="tracked-filter-panel hidden" data-panel="legendary">
+        <div class="tracked-filter-head">
+          <h2 class="tracked-filter-title">Filter by Legendary</h2>
+        </div>
+        <div class="tracked-filter-input-wrap tracked-filter-input-wrap--light">
+          <label class="tracked-filter-floating-label" for="trackedFilterLegendaryInput">Search</label>
+          <input id="trackedFilterLegendaryInput" type="search" class="tracked-filter-input tracked-filter-input--light" placeholder="Search legendary fruits…" autocomplete="off" />
+        </div>
+        <div id="trackedFilterLegendaryList" class="tracked-filter-list tracked-filter-list--scroll"></div>
+        <div class="tracked-filter-footer">
+          <button type="button" class="tracked-filter-clear" data-clear="legendary">
+            <span class="material-symbols-outlined">ink_eraser</span> Clear All
+          </button>
+        </div>
+      </div>
+
+      <div id="trackedFilterPanelMythical" class="tracked-filter-panel hidden" data-panel="mythical">
+        <div class="tracked-filter-head">
+          <h2 class="tracked-filter-title">Filter by Mythical</h2>
+        </div>
+        <div class="tracked-filter-input-wrap tracked-filter-input-wrap--light">
+          <label class="tracked-filter-floating-label" for="trackedFilterMythicalInput">Search</label>
+          <input id="trackedFilterMythicalInput" type="search" class="tracked-filter-input tracked-filter-input--light" placeholder="Search mythical fruits…" autocomplete="off" />
+        </div>
+        <div id="trackedFilterMythicalList" class="tracked-filter-list tracked-filter-list--scroll"></div>
+        <div class="tracked-filter-footer">
+          <button type="button" class="tracked-filter-clear" data-clear="mythical">
+            <span class="material-symbols-outlined">ink_eraser</span> Clear All
+          </button>
+        </div>
+      </div>
+
+      <div id="trackedFilterPanelEquipped" class="tracked-filter-panel hidden" data-panel="equipped">
+        <div class="tracked-filter-head">
+          <h2 class="tracked-filter-title">Filter by Equipped</h2>
+        </div>
+        <div class="tracked-filter-input-wrap tracked-filter-input-wrap--light">
+          <label class="tracked-filter-floating-label" for="trackedFilterEquippedInput">Search</label>
+          <input id="trackedFilterEquippedInput" type="search" class="tracked-filter-input tracked-filter-input--light" placeholder="Search fruit or mastery…" autocomplete="off" />
+        </div>
+        <div id="trackedFilterEquippedList" class="tracked-filter-list tracked-filter-list--scroll tracked-filter-list--equipped"></div>
+        <div class="tracked-filter-footer">
+          <button type="button" class="tracked-filter-clear" data-clear="equipped">
+            <span class="material-symbols-outlined">ink_eraser</span> Clear All
+          </button>
+        </div>
+      </div>
+
+      <div id="trackedFilterPanelGeneric" class="tracked-filter-panel hidden" data-panel="generic">
+        <h2 id="trackedFilterTitleGeneric" class="tracked-filter-title">Filter</h2>
+        <p class="tracked-filter-hint text-sm text-slate-400">Use the filter bar above (Find) for numeric ranges and more.</p>
+        <div class="tracked-filter-footer">
+          <button type="button" class="tracked-filter-clear" data-close-only>OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    const prefersReducedMotion = () =>
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function esc(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function escAttr(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    }
+
+    function applyModalListFilter(listEl, query) {
+      if (!listEl) return;
+      const q = (query || '').trim().toLowerCase();
+      listEl.querySelectorAll('.tracked-filter-row').forEach((row) => {
+        const txt = (row.textContent || '').toLowerCase().replace(/\s+/g, ' ');
+        row.style.display = !q || txt.includes(q) ? '' : 'none';
+      });
+    }
+
+    function fmtCompact(n) {
+      const x = Number(n);
+      if (!Number.isFinite(x)) return '0';
+      if (x >= 1e6) return (x / 1e6).toFixed(1) + 'M';
+      if (x >= 1e3) return (x / 1e3).toFixed(1) + 'K';
+      return String(Math.round(x));
+    }
+
+    function pickRandom(arr, n) {
+      const a = [...arr].sort(() => Math.random() - 0.5);
+      return a.slice(0, Math.min(n, a.length));
+    }
+
+    const RACE_BASE = ['Human', 'Mink', 'Skypiea', 'Fishman', 'Ghoul', 'Cyborg', 'Draco'];
+    const RACE_OPTIONS = RACE_BASE.flatMap((r) => [r, `${r}-V1`, `${r}-V2`, `${r}-V3`]);
+    const MELEE_FILTER_OPTIONS = [
+      'Godhuman',
+      'Death Step',
+      'Sharkman Karate',
+      'Superhuman',
+      'Dragon Talon',
+      'Electric Claw',
+      'Sanguine Art'
+    ];
+    const AWAKENED_KEY_OPTIONS = ['Z', 'X', 'C', 'V', 'F', 'M1'];
+    const meleePool = MELEE_FILTER_OPTIONS;
+    const LEGENDARY_FILTER_OPTIONS = [
+      'Blizzard-Blizzard',
+      'Pain-Pain',
+      'Rumble-Rumble',
+      'Portal-Portal',
+      'Phoenix-Phoenix',
+      'Sound-Sound',
+      'Spider-Spider',
+      'Love-Love',
+      'Buddha-Buddha'
+    ];
+    const MYTHICAL_FILTER_OPTIONS = [
+      'Dragon-Dragon',
+      'Kitsune-Kitsune',
+      'Leopard-Leopard',
+      'Spirit-Spirit',
+      'Control-Control',
+      'Venom-Venom',
+      'Shadow-Shadow',
+      'Dough-Dough',
+      'T-Rex-T-Rex',
+      'Mammoth-Mammoth',
+      'Gravity-Gravity'
+    ];
+    const legPool = LEGENDARY_FILTER_OPTIONS;
+    const mythPool = MYTHICAL_FILTER_OPTIONS;
+    const specialPool = ['Cursed Dual Katana', 'Valkyrie Helm', 'Pale Scarf', 'Tushita', 'x1 Mirror Fractal', 'x6 Alucard Fragment'];
+    const racePool = RACE_OPTIONS;
+    const EQUIP_FILTER_OPTIONS = [
+      'Dragon-Dragon',
+      'Kitsune-Kitsune',
+      'Leopard-Leopard',
+      'Spirit-Spirit',
+      'Control-Control',
+      'Venom-Venom',
+      'Shadow-Shadow',
+      'Dough-Dough',
+      'T-Rex-T-Rex',
+      'Mammoth-Mammoth',
+      'Gravity-Gravity',
+      'Blizzard-Blizzard',
+      'Pain-Pain',
+      'Rumble-Rumble',
+      'Portal-Portal',
+      'Phoenix-Phoenix',
+      'Sound-Sound',
+      'Spider-Spider',
+      'Love-Love',
+      'Buddha-Buddha',
+      'Quake-Quake',
+      'Magma-Magma',
+      'Ghost-Ghost',
+      'Barrier-Barrier',
+      'Rubber-Rubber',
+      'Light-Light',
+      'Diamond-Diamond',
+      'Dark-Dark',
+      'Sand-Sand',
+      'Ice-Ice',
+      'Falcon-Falcon',
+      'Flame-Flame',
+      'Spike-Spike',
+      'Smoke-Smoke',
+      'Bomb-Bomb',
+      'Spring-Spring',
+      'Chop-Chop',
+      'Spin-Spin',
+      'Rocket-Rocket'
+    ];
+    const equipPool = EQUIP_FILTER_OPTIONS;
+    const timePool = ['Just now', '2 weeks ago', '2 tuần trước', '3 days ago', '1 month ago', '5 hours ago', 'Yesterday'];
+    const API_BASE = 'http://localhost:4000/api';
+    let accounts = [];
+
+    const tbody = document.getElementById('accountTable');
+    const trackedCountEl = document.getElementById('trackedAccountCount');
+    const trackedAccountTotalEl = document.getElementById('trackedAccountTotal');
+    const accountPageSizeEl = document.getElementById('accountPageSize');
+    const selectedAccountIds = new Set();
+
+    /** Full list currently driving the table (all accounts or last Find result). */
+    let currentAccountList = accounts;
+
+    function getPageSizeLimit() {
+      if (!accountPageSizeEl) return Infinity;
+      const v = accountPageSizeEl.value;
+      if (v === 'all') return Infinity;
+      const n = parseInt(v, 10);
+      return Number.isFinite(n) && n > 0 ? n : Infinity;
+    }
+
+    function rowHtml(acc) {
+      const meleeTags = acc.melees
+        .map((t) => `<span class="tracked-tag tracked-tag--sky tracked-tag--melee">${esc(t)}</span>`)
+        .join('');
+      const legTags =
+        acc.legendaryTags.length > 0
+          ? acc.legendaryTags.map((t) => `<span class="tracked-tag tracked-tag--yellow tracked-tag--legendary">${esc(t)}</span>`).join('')
+          : `<span class="tracked-tag tracked-tag--muted">None</span>`;
+      const mythTags =
+        acc.mythicalTags.length > 0
+          ? acc.mythicalTags.map((t) => `<span class="tracked-tag tracked-tag--orange tracked-tag--mythical">${esc(t)}</span>`).join('')
+          : `<span class="tracked-tag tracked-tag--muted">None</span>`;
+      const specTags = acc.specialItems.map((t) => `<span class="tracked-tag tracked-tag--brown">${esc(t)}</span>`).join('');
+      const bh = fmtCompact(acc.bounty);
+      const bl = fmtCompact(acc.beli);
+      const fr = acc.fragments.toLocaleString('en-US');
+      return `
+        <td class="px-2 py-3 text-center align-top">
+          <input type="checkbox" class="acc-row-cb mt-1.5 h-4 w-4 rounded border-white/20 bg-slate-900 accent-cyan" data-account-id="${escAttr(
+            acc.id || acc.name
+          )}" aria-label="Select ${escAttr(acc.name)}" />
+        </td>
+        <td class="px-3 py-3 align-top min-w-[10rem]">
+          <div class="tracked-info-name truncate max-w-[12rem]" title="${esc(acc.name)}">${esc(acc.name)}</div>
+          <div class="tracked-info-time">${esc(acc.updatedAt)}</div>
+        </td>
+        <td class="px-3 py-3 align-top">
+          <div class="tracked-stats">
+            <div class="tracked-stats-row"><span class="tracked-stats-k">Level:</span><span class="tracked-stats-v-level">${acc.level}</span></div>
+            <div class="tracked-stats-row"><span class="tracked-stats-k">Bounty:</span><span class="tracked-stats-v-bounty">${esc(bh)}</span></div>
+            <div class="tracked-stats-row"><span class="tracked-stats-k">Beli:</span><span class="tracked-stats-v-beli">${esc(bl)}</span></div>
+            <div class="tracked-stats-row"><span class="tracked-stats-k">Fragments:</span><span class="tracked-stats-v-frag">${esc(fr)}</span></div>
+            <div class="tracked-stats-row"><span class="tracked-stats-k">Sea:</span><span class="tracked-stats-v-sea">${acc.sea}</span></div>
+          </div>
+        </td>
+        <td class="px-3 py-3 align-top"><span class="tracked-tag tracked-tag--sky">${esc(acc.raceTag)}</span></td>
+        <td class="px-3 py-3 align-top"><span class="tracked-tier-pill font-mono tabular-nums">${acc.tierCur}<span class="text-slate-500">/${acc.tierMax}</span></span></td>
+        <td class="px-3 py-3 align-top"><div class="tracked-tag-row">${meleeTags}</div></td>
+        <td class="px-3 py-3 align-top"><div class="tracked-tag-row">${
+          acc.awakenedKeys.length
+            ? acc.awakenedKeys.map((k) => `<span class="tracked-tag tracked-tag--green">${esc(k)}</span>`).join('')
+            : `<span class="tracked-tag tracked-tag--muted">None</span>`
+        }</div></td>
+        <td class="px-3 py-3 align-top max-w-[14rem]"><span class="tracked-tag tracked-tag--navy tracked-tag--equipped whitespace-normal text-left leading-snug">${esc(
+          acc.equippedFruit
+        )} <span class="tracked-mastery text-slate-500 font-normal">| Mastery: ${acc.equippedMastery}</span></span></td>
+        <td class="px-3 py-3 align-top"><div class="tracked-tag-row">${legTags}</div></td>
+        <td class="px-3 py-3 align-top"><div class="tracked-tag-row">${mythTags}</div></td>
+        <td class="px-3 py-3 align-top"><span class="tracked-tag tracked-tag--pulled">${esc(acc.pulled)}</span></td>
+        <td class="px-3 py-3 align-top"><div class="tracked-tag-row max-w-[15rem]">${specTags}</div></td>`;
+    }
+
+    function getSegmentValue(group) {
+      const btn = document.querySelector(`.filter-seg-btn.is-active[data-filter-group="${group}"]`);
+      return btn ? btn.getAttribute('data-value') : 'all';
+    }
+
+    function numVal(id) {
+      const el = document.getElementById(id);
+      if (!el || el.value === '') return null;
+      const n = parseFloat(el.value);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    const trackedColFilters = {
+      race: new Set(),
+      raceSearch: '',
+      melees: new Set(),
+      meleesSearch: '',
+      awakened: new Set(),
+      awakenedSearch: '',
+      tier: new Set(),
+      tierSearch: '',
+      legendary: new Set(),
+      legendarySearch: '',
+      mythical: new Set(),
+      mythicalSearch: '',
+      equipped: new Set(),
+      equippedSearch: ''
+    };
+
+    function racePass(acc) {
+      const sel = trackedColFilters.race;
+      const q = (trackedColFilters.raceSearch || '').trim().toLowerCase();
+      if (q && !acc.raceTag.toLowerCase().includes(q)) return false;
+      if (sel.size === 0) return true;
+      return sel.has(acc.raceTag);
+    }
+
+    function meleesPass(acc) {
+      const sel = trackedColFilters.melees;
+      const q = (trackedColFilters.meleesSearch || '').trim().toLowerCase();
+      if (q) {
+        const ok = acc.melees.some((m) => m.toLowerCase().includes(q));
+        if (!ok) return false;
+      }
+      if (sel.size === 0) return true;
+      return [...sel].some((m) => acc.melees.includes(m));
+    }
+
+    function awakenedPass(acc) {
+      const sel = trackedColFilters.awakened;
+      const keys = acc.awakenedKeys || [];
+      const q = (trackedColFilters.awakenedSearch || '').trim().toLowerCase();
+      if (q) {
+        const ok = keys.some((k) => k.toLowerCase().includes(q));
+        if (!ok) return false;
+      }
+      if (sel.size === 0) return true;
+      return [...sel].some((k) => keys.includes(k));
+    }
+
+    function tierPass(acc) {
+      const sel = trackedColFilters.tier;
+      const q = (trackedColFilters.tierSearch || '').trim().toLowerCase();
+      if (q) {
+        const t = String(acc.tierCur);
+        if (!t.includes(q)) return false;
+      }
+      if (sel.size === 0) return true;
+      return sel.has(acc.tierCur);
+    }
+
+    function legendaryPass(acc) {
+      const sel = trackedColFilters.legendary;
+      const tags = acc.legendaryTags || [];
+      const q = (trackedColFilters.legendarySearch || '').trim().toLowerCase();
+      if (q) {
+        const ok = tags.some((t) => t.toLowerCase().includes(q));
+        if (!ok) return false;
+      }
+      if (sel.size === 0) return true;
+      if (!tags.length) return false;
+      return [...sel].some((t) => tags.includes(t));
+    }
+
+    function mythicalPass(acc) {
+      const sel = trackedColFilters.mythical;
+      const tags = acc.mythicalTags || [];
+      const q = (trackedColFilters.mythicalSearch || '').trim().toLowerCase();
+      if (q) {
+        const ok = tags.some((t) => t.toLowerCase().includes(q));
+        if (!ok) return false;
+      }
+      if (sel.size === 0) return true;
+      if (!tags.length) return false;
+      return [...sel].some((t) => tags.includes(t));
+    }
+
+    function equippedPass(acc) {
+      const sel = trackedColFilters.equipped;
+      const q = (trackedColFilters.equippedSearch || '').trim().toLowerCase();
+      const hay = `${acc.equippedFruit} ${acc.equippedMastery}`.toLowerCase();
+      if (q) {
+        if (!hay.includes(q)) return false;
+      }
+      if (sel.size === 0) return true;
+      return sel.has(acc.equippedFruit);
+    }
+
+    function buildFilteredAccountsList() {
+      const q = (document.getElementById('filterUsername').value || '').trim().toLowerCase();
+      const status = getSegmentValue('status');
+      const lvlMin = numVal('filterLevelMin');
+      const lvlMax = numVal('filterLevelMax');
+      const bountyMin = numVal('filterBountyMin');
+      const bountyMax = numVal('filterBountyMax');
+      const beliMin = numVal('filterBeliMin');
+      const beliMax = numVal('filterBeliMax');
+      const fragMin = numVal('filterFragmentsMin');
+      const fragMax = numVal('filterFragmentsMax');
+      const legMin = numVal('filterLegMin');
+      const legMax = numVal('filterLegMax');
+      const mythMin = numVal('filterMythMin');
+      const mythMax = numVal('filterMythMax');
+
+      return accounts.filter((acc) => {
+        if (q && !acc.name.toLowerCase().includes(q)) return false;
+        if (status === 'online' && !acc.online) return false;
+        if (status === 'offline' && acc.online) return false;
+        if (lvlMin !== null && acc.level < lvlMin) return false;
+        if (lvlMax !== null && acc.level > lvlMax) return false;
+        if (bountyMin !== null && acc.bounty < bountyMin) return false;
+        if (bountyMax !== null && acc.bounty > bountyMax) return false;
+        if (beliMin !== null && acc.beli < beliMin) return false;
+        if (beliMax !== null && acc.beli > beliMax) return false;
+        if (fragMin !== null && acc.fragments < fragMin) return false;
+        if (fragMax !== null && acc.fragments > fragMax) return false;
+        if (legMin !== null && acc.legendaryTags.length < legMin) return false;
+        if (legMax !== null && acc.legendaryTags.length > legMax) return false;
+        if (mythMin !== null && acc.mythicalTags.length < mythMin) return false;
+        if (mythMax !== null && acc.mythicalTags.length > mythMax) return false;
+        if (!racePass(acc)) return false;
+        if (!tierPass(acc)) return false;
+        if (!meleesPass(acc)) return false;
+        if (!awakenedPass(acc)) return false;
+        if (!legendaryPass(acc)) return false;
+        if (!mythicalPass(acc)) return false;
+        if (!equippedPass(acc)) return false;
+        return true;
+      });
+    }
+
+    let accountPageIndex = 0;
+
+    function syncTrackedAccountTotal() {
+      if (!trackedAccountTotalEl) return;
+      trackedAccountTotalEl.textContent = `${accounts.length} accounts tracked`;
+    }
+
+    async function apiFetch(path, options = {}) {
+      const res = await fetch(`${API_BASE}${path}`, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(options.headers || {}),
+        },
+        ...options,
+      });
+      if (!res.ok) {
+        let msg = 'Request failed';
+        try {
+          const body = await res.json();
+          if (body?.error) msg = body.error;
+        } catch (_) {}
+        const err = new Error(msg);
+        err.status = res.status;
+        throw err;
+      }
+      if (res.status === 204) return null;
+      return res.json();
+    }
+
+    async function ensureSession() {
+      try {
+        const data = await apiFetch('/auth/me', { method: 'GET' });
+        const usernameNode = document.querySelector('.profile-card .text-sm.font-bold');
+        if (usernameNode && data?.user?.username) usernameNode.textContent = data.user.username;
+      } catch (_) {
+        window.location.replace('login.html');
+      }
+    }
+
+    async function loadTrackStats() {
+      try {
+        const payload = await apiFetch('/track-stats', { method: 'GET' });
+        accounts = Array.isArray(payload?.data) ? payload.data : [];
+      } catch (_) {
+        accounts = [];
+      }
+      selectedAccountIds.clear();
+      syncTrackedAccountTotal();
+      refreshTrackedTable();
+      syncBulkActionsUi();
+    }
+
+    function syncBulkActionsUi() {
+      const bulk = document.getElementById('accountBulkActions');
+      const total = selectedAccountIds.size;
+      if (bulk) bulk.classList.toggle('hidden', total === 0);
+      ['bulkCountDelete', 'bulkCountDeleteCookies', 'bulkCountGoogleSheets', 'bulkCountCookies'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = String(total);
+      });
+
+      const selectAll = document.getElementById('accountSelectAll');
+      const rowCbs = Array.from(document.querySelectorAll('#accountTable .acc-row-cb'));
+      if (selectAll) {
+        const checkedCount = rowCbs.filter((cb) => cb.checked).length;
+        selectAll.checked = rowCbs.length > 0 && checkedCount === rowCbs.length;
+        selectAll.indeterminate = checkedCount > 0 && checkedCount < rowCbs.length;
+      }
+    }
+
+    function renderAccountRows(fullList) {
+      currentAccountList = fullList;
+      const pageSize = getPageSizeLimit();
+      const total = fullList.length;
+      const finitePage = Number.isFinite(pageSize) && pageSize > 0;
+      const usePages = finitePage && pageSize < total;
+      const pages = total === 0 ? 0 : usePages ? Math.ceil(total / pageSize) : 1;
+      if (pages > 0 && accountPageIndex > pages - 1) accountPageIndex = Math.max(0, pages - 1);
+      const start = total === 0 || !usePages ? 0 : accountPageIndex * pageSize;
+      const slice =
+        total === 0 ? [] : usePages ? fullList.slice(start, Math.min(start + pageSize, total)) : fullList;
+      tbody.innerHTML = '';
+      slice.forEach((acc) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-white/[0.04] transition-colors duration-200 ease-out';
+        tr.innerHTML = rowHtml(acc);
+        tbody.appendChild(tr);
+        const rowCb = tr.querySelector('.acc-row-cb');
+        if (rowCb) rowCb.checked = selectedAccountIds.has(acc.name);
+      });
+      if (trackedCountEl) {
+        if (total === 0) {
+          trackedCountEl.textContent = '0 items';
+        } else if (slice.length === total) {
+          trackedCountEl.textContent = `${total} items`;
+        } else {
+          const lo = start + 1;
+          const hi = start + slice.length;
+          trackedCountEl.textContent = `${lo}–${hi} of ${total}`;
+        }
+      }
+      const ind = document.getElementById('accountPageIndicator');
+      const prevBtn = document.getElementById('accountPagePrev');
+      const nextBtn = document.getElementById('accountPageNext');
+      if (ind) {
+        ind.textContent = total === 0 ? 'Page 0 / 0' : `Page ${accountPageIndex + 1} / ${pages}`;
+      }
+      if (prevBtn) prevBtn.disabled = accountPageIndex <= 0 || total === 0;
+      if (nextBtn) nextBtn.disabled = total === 0 || accountPageIndex >= pages - 1;
+      syncBulkActionsUi();
+    }
+
+    function runAccountFilterFind() {
+      refreshTrackedTable();
+    }
+
+    function syncTrackedThFilterButtons() {
+      const active = {
+        race: trackedColFilters.race.size > 0 || (trackedColFilters.raceSearch || '').trim().length > 0,
+        tier: trackedColFilters.tier.size > 0 || (trackedColFilters.tierSearch || '').trim().length > 0,
+        melees:
+          trackedColFilters.melees.size > 0 || (trackedColFilters.meleesSearch || '').trim().length > 0,
+        awakened:
+          trackedColFilters.awakened.size > 0 || (trackedColFilters.awakenedSearch || '').trim().length > 0,
+        legendary:
+          trackedColFilters.legendary.size > 0 || (trackedColFilters.legendarySearch || '').trim().length > 0,
+        mythical:
+          trackedColFilters.mythical.size > 0 || (trackedColFilters.mythicalSearch || '').trim().length > 0,
+        equipped:
+          trackedColFilters.equipped.size > 0 || (trackedColFilters.equippedSearch || '').trim().length > 0
+      };
+      document.querySelectorAll('.tracked-th-filter-btn').forEach((btn) => {
+        const id = btn.getAttribute('data-col-filter');
+        if (id in active) btn.classList.toggle('is-active', active[id]);
+      });
+    }
+
+    function refreshTrackedTable() {
+      accountPageIndex = 0;
+      renderAccountRows(buildFilteredAccountsList());
+      syncTrackedThFilterButtons();
+    }
+
+    function renderAllAccounts() {
+      refreshTrackedTable();
+    }
+
+    function clearTrackedColumnFiltersUi() {
+      trackedColFilters.race.clear();
+      trackedColFilters.raceSearch = '';
+      trackedColFilters.melees.clear();
+      trackedColFilters.meleesSearch = '';
+      trackedColFilters.awakened.clear();
+      trackedColFilters.awakenedSearch = '';
+      trackedColFilters.tier.clear();
+      trackedColFilters.tierSearch = '';
+      trackedColFilters.legendary.clear();
+      trackedColFilters.legendarySearch = '';
+      trackedColFilters.mythical.clear();
+      trackedColFilters.mythicalSearch = '';
+      trackedColFilters.equipped.clear();
+      trackedColFilters.equippedSearch = '';
+      document.querySelectorAll('#trackedFilterRaceList .tracked-filter-cb').forEach((cb) => {
+        cb.checked = false;
+      });
+      document.querySelectorAll('#trackedFilterMeleesList .tracked-filter-cb').forEach((cb) => {
+        cb.checked = false;
+      });
+      document.querySelectorAll('#trackedFilterAwakenedList .tracked-filter-cb').forEach((cb) => {
+        cb.checked = false;
+      });
+      document.querySelectorAll('#trackedFilterTierList .tracked-filter-cb').forEach((cb) => {
+        cb.checked = false;
+      });
+      document.querySelectorAll('#trackedFilterLegendaryList .tracked-filter-cb').forEach((cb) => {
+        cb.checked = false;
+      });
+      document.querySelectorAll('#trackedFilterMythicalList .tracked-filter-cb').forEach((cb) => {
+        cb.checked = false;
+      });
+      document.querySelectorAll('#trackedFilterEquippedList .tracked-filter-cb').forEach((cb) => {
+        cb.checked = false;
+      });
+      const mi = document.getElementById('trackedFilterMeleesInput');
+      if (mi) mi.value = '';
+      const eqIn = document.getElementById('trackedFilterEquippedInput');
+      if (eqIn) eqIn.value = '';
+      const ri = document.getElementById('trackedFilterRaceInput');
+      if (ri) ri.value = '';
+      const ti = document.getElementById('trackedFilterTierInput');
+      if (ti) ti.value = '';
+      const ai = document.getElementById('trackedFilterAwakenedInput');
+      if (ai) ai.value = '';
+      const li = document.getElementById('trackedFilterLegendaryInput');
+      if (li) li.value = '';
+      const myi = document.getElementById('trackedFilterMythicalInput');
+      if (myi) myi.value = '';
+    }
+
+    let activeTrackedFilterAnchor = null;
+
+    function positionTrackedFilterModal(anchorEl) {
+      const modal = document.getElementById('trackedFilterModal');
+      if (!modal || !anchorEl) return;
+      const rect = anchorEl.getBoundingClientRect();
+      const margin = 12;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const modalW = modal.offsetWidth || 360;
+      const modalH = modal.offsetHeight || 520;
+
+      let left = rect.right + 10;
+      if (left + modalW > vw - margin) left = rect.left - modalW - 10;
+      if (left < margin) left = Math.max(margin, vw - modalW - margin);
+
+      let top = rect.top - 8;
+      if (top + modalH > vh - margin) top = vh - modalH - margin;
+      if (top < margin) top = margin;
+
+      modal.style.left = `${Math.round(left)}px`;
+      modal.style.top = `${Math.round(top)}px`;
+    }
+
+    function openTrackedFilterModal(col, triggerEl) {
+      const modal = document.getElementById('trackedFilterModal');
+      if (!modal) return;
+      const panels = {
+        race: document.getElementById('trackedFilterPanelRace'),
+        tier: document.getElementById('trackedFilterPanelTier'),
+        melees: document.getElementById('trackedFilterPanelMelees'),
+        awakened: document.getElementById('trackedFilterPanelAwakened'),
+        legendary: document.getElementById('trackedFilterPanelLegendary'),
+        mythical: document.getElementById('trackedFilterPanelMythical'),
+        equipped: document.getElementById('trackedFilterPanelEquipped'),
+        generic: document.getElementById('trackedFilterPanelGeneric')
+      };
+      const showGeneric = !panels[col];
+      Object.values(panels).forEach((p) => {
+        if (!p) return;
+        p.classList.add('hidden');
+        p.style.display = 'none';
+      });
+      if (showGeneric) {
+        if (panels.generic) {
+          panels.generic.classList.remove('hidden');
+          panels.generic.style.display = 'flex';
+        }
+      } else if (panels[col]) {
+        panels[col].classList.remove('hidden');
+        panels[col].style.display = 'flex';
+      }
+      modal.classList.remove('hidden');
+      modal.style.display = 'block';
+      activeTrackedFilterAnchor = triggerEl || activeTrackedFilterAnchor;
+      requestAnimationFrame(() => {
+        if (activeTrackedFilterAnchor) positionTrackedFilterModal(activeTrackedFilterAnchor);
+      });
+
+      const firstInput = modal && modal.querySelector('.tracked-filter-panel:not(.hidden) input[type="search"]');
+      if (firstInput) requestAnimationFrame(() => firstInput.focus());
+    }
+
+    function closeTrackedFilterModal() {
+      const modal = document.getElementById('trackedFilterModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+      }
+    }
+
+    function initTrackedColumnFilters() {
+      const raceList = document.getElementById('trackedFilterRaceList');
+      if (raceList && raceList.childElementCount === 0) {
+        RACE_OPTIONS.forEach((label) => {
+          const id = `tf_r_${label.replace(/[^a-zA-Z0-9]+/g, '_')}`;
+          const row = document.createElement('label');
+          row.className = 'tracked-filter-row';
+          row.setAttribute('for', id);
+          row.innerHTML = `<input type="checkbox" id="${id}" class="tracked-filter-cb" data-kind="race" data-value="${escAttr(
+            label
+          )}" /><span class="tracked-filter-row-txt">${esc(label)}</span>`;
+          raceList.appendChild(row);
+        });
+        raceList.addEventListener('change', (e) => {
+          const cb = e.target.closest('input[data-kind="race"]');
+          if (!cb) return;
+          const v = cb.getAttribute('data-value');
+          if (cb.checked) trackedColFilters.race.add(v);
+          else trackedColFilters.race.delete(v);
+          refreshTrackedTable();
+        });
+      }
+
+      const tierList = document.getElementById('trackedFilterTierList');
+      if (tierList && tierList.childElementCount === 0) {
+        for (let t = 1; t <= 10; t++) {
+          const id = `tf_t_${t}`;
+          const row = document.createElement('label');
+          row.className = 'tracked-filter-row tracked-filter-row--tier';
+          row.setAttribute('for', id);
+          row.innerHTML = `<input type="checkbox" id="${id}" class="tracked-filter-cb" data-kind="tier" data-value="${t}" /><span class="tracked-filter-row-txt">${t}</span>`;
+          tierList.appendChild(row);
+        }
+        tierList.addEventListener('change', (e) => {
+          const cb = e.target.closest('input[data-kind="tier"]');
+          if (!cb) return;
+          const v = parseInt(cb.getAttribute('data-value'), 10);
+          if (cb.checked) trackedColFilters.tier.add(v);
+          else trackedColFilters.tier.delete(v);
+          refreshTrackedTable();
+        });
+      }
+
+      const meleesList = document.getElementById('trackedFilterMeleesList');
+      if (meleesList && meleesList.childElementCount === 0) {
+        MELEE_FILTER_OPTIONS.forEach((label) => {
+          const id = `tf_m_${label.replace(/[^a-zA-Z0-9]+/g, '_')}`;
+          const row = document.createElement('label');
+          row.className = 'tracked-filter-row';
+          row.setAttribute('for', id);
+          row.innerHTML = `<input type="checkbox" id="${id}" class="tracked-filter-cb" data-kind="melee" data-value="${escAttr(
+            label
+          )}" /><span class="tracked-filter-row-txt">${esc(label)}</span>`;
+          meleesList.appendChild(row);
+        });
+        meleesList.addEventListener('change', (e) => {
+          const cb = e.target.closest('input[data-kind="melee"]');
+          if (!cb) return;
+          const v = cb.getAttribute('data-value');
+          if (cb.checked) trackedColFilters.melees.add(v);
+          else trackedColFilters.melees.delete(v);
+          refreshTrackedTable();
+        });
+      }
+
+      const awakenedList = document.getElementById('trackedFilterAwakenedList');
+      if (awakenedList && awakenedList.childElementCount === 0) {
+        AWAKENED_KEY_OPTIONS.forEach((label) => {
+          const id = `tf_a_${label}`;
+          const row = document.createElement('label');
+          row.className = 'tracked-filter-row tracked-filter-row--awakened';
+          row.setAttribute('for', id);
+          row.innerHTML = `<input type="checkbox" id="${id}" class="tracked-filter-cb" data-kind="awakened" data-value="${escAttr(
+            label
+          )}" /><span class="tracked-filter-row-txt">${esc(label)}</span>`;
+          awakenedList.appendChild(row);
+        });
+        awakenedList.addEventListener('change', (e) => {
+          const cb = e.target.closest('input[data-kind="awakened"]');
+          if (!cb) return;
+          const v = cb.getAttribute('data-value');
+          if (cb.checked) trackedColFilters.awakened.add(v);
+          else trackedColFilters.awakened.delete(v);
+          refreshTrackedTable();
+        });
+      }
+
+      const legendaryList = document.getElementById('trackedFilterLegendaryList');
+      if (legendaryList && legendaryList.childElementCount === 0) {
+        LEGENDARY_FILTER_OPTIONS.forEach((label) => {
+          const id = `tf_l_${label.replace(/[^a-zA-Z0-9]+/g, '_')}`;
+          const row = document.createElement('label');
+          row.className = 'tracked-filter-row';
+          row.setAttribute('for', id);
+          row.innerHTML = `<input type="checkbox" id="${id}" class="tracked-filter-cb" data-kind="legendary" data-value="${escAttr(
+            label
+          )}" /><span class="tracked-filter-row-txt">${esc(label)}</span>`;
+          legendaryList.appendChild(row);
+        });
+        legendaryList.addEventListener('change', (e) => {
+          const cb = e.target.closest('input[data-kind="legendary"]');
+          if (!cb) return;
+          const v = cb.getAttribute('data-value');
+          if (cb.checked) trackedColFilters.legendary.add(v);
+          else trackedColFilters.legendary.delete(v);
+          refreshTrackedTable();
+        });
+      }
+
+      const mythicalList = document.getElementById('trackedFilterMythicalList');
+      if (mythicalList && mythicalList.childElementCount === 0) {
+        MYTHICAL_FILTER_OPTIONS.forEach((label) => {
+          const id = `tf_my_${label.replace(/[^a-zA-Z0-9]+/g, '_')}`;
+          const row = document.createElement('label');
+          row.className = 'tracked-filter-row';
+          row.setAttribute('for', id);
+          row.innerHTML = `<input type="checkbox" id="${id}" class="tracked-filter-cb" data-kind="mythical" data-value="${escAttr(
+            label
+          )}" /><span class="tracked-filter-row-txt">${esc(label)}</span>`;
+          mythicalList.appendChild(row);
+        });
+        mythicalList.addEventListener('change', (e) => {
+          const cb = e.target.closest('input[data-kind="mythical"]');
+          if (!cb) return;
+          const v = cb.getAttribute('data-value');
+          if (cb.checked) trackedColFilters.mythical.add(v);
+          else trackedColFilters.mythical.delete(v);
+          refreshTrackedTable();
+        });
+      }
+
+      const equippedList = document.getElementById('trackedFilterEquippedList');
+      if (equippedList && equippedList.childElementCount === 0) {
+        EQUIP_FILTER_OPTIONS.forEach((label) => {
+          const id = `tf_eq_${label.replace(/[^a-zA-Z0-9]+/g, '_')}`;
+          const row = document.createElement('label');
+          row.className = 'tracked-filter-row';
+          row.setAttribute('for', id);
+          row.innerHTML = `<input type="checkbox" id="${id}" class="tracked-filter-cb" data-kind="equipped" data-value="${escAttr(
+            label
+          )}" /><span class="tracked-filter-row-txt">${esc(label)}</span>`;
+          equippedList.appendChild(row);
+        });
+        equippedList.addEventListener('change', (e) => {
+          const cb = e.target.closest('input[data-kind="equipped"]');
+          if (!cb) return;
+          const v = cb.getAttribute('data-value');
+          if (cb.checked) trackedColFilters.equipped.add(v);
+          else trackedColFilters.equipped.delete(v);
+          refreshTrackedTable();
+        });
+      }
+
+      document.querySelectorAll('.tracked-filter-clear[data-clear]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const k = btn.getAttribute('data-clear');
+          if (k === 'race') {
+            trackedColFilters.race.clear();
+            trackedColFilters.raceSearch = '';
+            document.querySelectorAll('#trackedFilterRaceList .tracked-filter-cb').forEach((cb) => {
+              cb.checked = false;
+            });
+            const rin = document.getElementById('trackedFilterRaceInput');
+            if (rin) rin.value = '';
+            applyModalListFilter(document.getElementById('trackedFilterRaceList'), '');
+          } else if (k === 'melees') {
+            trackedColFilters.melees.clear();
+            trackedColFilters.meleesSearch = '';
+            document.querySelectorAll('#trackedFilterMeleesList .tracked-filter-cb').forEach((cb) => {
+              cb.checked = false;
+            });
+            const mi = document.getElementById('trackedFilterMeleesInput');
+            if (mi) mi.value = '';
+            applyModalListFilter(document.getElementById('trackedFilterMeleesList'), '');
+          } else if (k === 'awakened') {
+            trackedColFilters.awakened.clear();
+            trackedColFilters.awakenedSearch = '';
+            document.querySelectorAll('#trackedFilterAwakenedList .tracked-filter-cb').forEach((cb) => {
+              cb.checked = false;
+            });
+            const aIn = document.getElementById('trackedFilterAwakenedInput');
+            if (aIn) aIn.value = '';
+            applyModalListFilter(document.getElementById('trackedFilterAwakenedList'), '');
+          } else if (k === 'tier') {
+            trackedColFilters.tier.clear();
+            trackedColFilters.tierSearch = '';
+            document.querySelectorAll('#trackedFilterTierList .tracked-filter-cb').forEach((cb) => {
+              cb.checked = false;
+            });
+            const tin = document.getElementById('trackedFilterTierInput');
+            if (tin) tin.value = '';
+            applyModalListFilter(document.getElementById('trackedFilterTierList'), '');
+          } else if (k === 'legendary') {
+            trackedColFilters.legendary.clear();
+            trackedColFilters.legendarySearch = '';
+            document.querySelectorAll('#trackedFilterLegendaryList .tracked-filter-cb').forEach((cb) => {
+              cb.checked = false;
+            });
+            const lin = document.getElementById('trackedFilterLegendaryInput');
+            if (lin) lin.value = '';
+            applyModalListFilter(document.getElementById('trackedFilterLegendaryList'), '');
+          } else if (k === 'mythical') {
+            trackedColFilters.mythical.clear();
+            trackedColFilters.mythicalSearch = '';
+            document.querySelectorAll('#trackedFilterMythicalList .tracked-filter-cb').forEach((cb) => {
+              cb.checked = false;
+            });
+            const myIn = document.getElementById('trackedFilterMythicalInput');
+            if (myIn) myIn.value = '';
+            applyModalListFilter(document.getElementById('trackedFilterMythicalList'), '');
+          } else if (k === 'equipped') {
+            trackedColFilters.equipped.clear();
+            trackedColFilters.equippedSearch = '';
+            document.querySelectorAll('#trackedFilterEquippedList .tracked-filter-cb').forEach((cb) => {
+              cb.checked = false;
+            });
+            const eqIn = document.getElementById('trackedFilterEquippedInput');
+            if (eqIn) eqIn.value = '';
+            applyModalListFilter(document.getElementById('trackedFilterEquippedList'), '');
+          }
+          refreshTrackedTable();
+        });
+      });
+
+      const raceListEl = document.getElementById('trackedFilterRaceList');
+      const raceInput = document.getElementById('trackedFilterRaceInput');
+      if (raceInput && raceListEl) {
+        const sync = () => {
+          trackedColFilters.raceSearch = raceInput.value || '';
+          applyModalListFilter(raceListEl, raceInput.value);
+          refreshTrackedTable();
+        };
+        raceInput.addEventListener('input', sync);
+        raceInput.addEventListener('search', () => {
+          if (raceInput.value === '') sync();
+        });
+      }
+
+      const tierListEl = document.getElementById('trackedFilterTierList');
+      const tierInput = document.getElementById('trackedFilterTierInput');
+      if (tierInput && tierListEl) {
+        const sync = () => {
+          trackedColFilters.tierSearch = tierInput.value || '';
+          applyModalListFilter(tierListEl, tierInput.value);
+          refreshTrackedTable();
+        };
+        tierInput.addEventListener('input', sync);
+        tierInput.addEventListener('search', () => {
+          if (tierInput.value === '') sync();
+        });
+      }
+
+      const meleesListEl = document.getElementById('trackedFilterMeleesList');
+      const meleesInput = document.getElementById('trackedFilterMeleesInput');
+      if (meleesInput && meleesListEl) {
+        const syncMeleesSearch = () => {
+          trackedColFilters.meleesSearch = meleesInput.value || '';
+          applyModalListFilter(meleesListEl, meleesInput.value);
+          refreshTrackedTable();
+        };
+        meleesInput.addEventListener('input', syncMeleesSearch);
+        meleesInput.addEventListener('search', () => {
+          if (meleesInput.value === '') syncMeleesSearch();
+        });
+      }
+
+      const awakenedListEl = document.getElementById('trackedFilterAwakenedList');
+      const awakenedInput = document.getElementById('trackedFilterAwakenedInput');
+      if (awakenedInput && awakenedListEl) {
+        const sync = () => {
+          trackedColFilters.awakenedSearch = awakenedInput.value || '';
+          applyModalListFilter(awakenedListEl, awakenedInput.value);
+          refreshTrackedTable();
+        };
+        awakenedInput.addEventListener('input', sync);
+        awakenedInput.addEventListener('search', () => {
+          if (awakenedInput.value === '') sync();
+        });
+      }
+
+      const legendaryListEl = document.getElementById('trackedFilterLegendaryList');
+      const legendaryInput = document.getElementById('trackedFilterLegendaryInput');
+      if (legendaryInput && legendaryListEl) {
+        const sync = () => {
+          trackedColFilters.legendarySearch = legendaryInput.value || '';
+          applyModalListFilter(legendaryListEl, legendaryInput.value);
+          refreshTrackedTable();
+        };
+        legendaryInput.addEventListener('input', sync);
+        legendaryInput.addEventListener('search', () => {
+          if (legendaryInput.value === '') sync();
+        });
+      }
+
+      const mythicalListEl = document.getElementById('trackedFilterMythicalList');
+      const mythicalInput = document.getElementById('trackedFilterMythicalInput');
+      if (mythicalInput && mythicalListEl) {
+        const sync = () => {
+          trackedColFilters.mythicalSearch = mythicalInput.value || '';
+          applyModalListFilter(mythicalListEl, mythicalInput.value);
+          refreshTrackedTable();
+        };
+        mythicalInput.addEventListener('input', sync);
+        mythicalInput.addEventListener('search', () => {
+          if (mythicalInput.value === '') sync();
+        });
+      }
+
+      const equippedInput = document.getElementById('trackedFilterEquippedInput');
+      const equippedListEl = document.getElementById('trackedFilterEquippedList');
+      if (equippedInput && equippedListEl) {
+        const syncEquippedSearch = () => {
+          trackedColFilters.equippedSearch = equippedInput.value || '';
+          applyModalListFilter(equippedListEl, equippedInput.value);
+          refreshTrackedTable();
+        };
+        equippedInput.addEventListener('input', syncEquippedSearch);
+        equippedInput.addEventListener('search', () => {
+          if (equippedInput.value === '') syncEquippedSearch();
+        });
+      }
+
+      const closeBtn = document.getElementById('trackedFilterClose');
+      if (closeBtn) closeBtn.addEventListener('click', closeTrackedFilterModal);
+
+      document.querySelectorAll('.tracked-filter-clear[data-close-only]').forEach((b) => {
+        b.addEventListener('click', closeTrackedFilterModal);
+      });
+
+      document.addEventListener('keydown', (e) => {
+        const m = document.getElementById('trackedFilterModal');
+        if (e.key === 'Escape' && m && !m.classList.contains('hidden')) closeTrackedFilterModal();
+      });
+
+      window.addEventListener('resize', () => {
+        const m = document.getElementById('trackedFilterModal');
+        if (!m || m.classList.contains('hidden') || !activeTrackedFilterAnchor) return;
+        positionTrackedFilterModal(activeTrackedFilterAnchor);
+      });
+    }
+
+    document.querySelectorAll('.filter-seg-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const g = btn.getAttribute('data-filter-group');
+        document.querySelectorAll(`.filter-seg-btn[data-filter-group="${g}"]`).forEach((b) => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        if (g === 'panel') {
+          const show = btn.getAttribute('data-value') === 'yes';
+          const panel = document.getElementById('accountFiltersPanel');
+          if (panel) panel.classList.toggle('hidden', !show);
+        }
+      });
+    });
+
+    const filterFindBtn = document.getElementById('filterFindBtn');
+    if (filterFindBtn) filterFindBtn.addEventListener('click', runAccountFilterFind);
+
+    const accountFiltersPanel = document.getElementById('accountFiltersPanel');
+    if (accountFiltersPanel) {
+      accountFiltersPanel.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.repeat) {
+          e.preventDefault();
+          runAccountFilterFind();
+        }
+      });
+    }
+
+    function initAccountPagination() {
+      const prev = document.getElementById('accountPagePrev');
+      const next = document.getElementById('accountPageNext');
+      if (prev) {
+        prev.addEventListener('click', () => {
+          if (accountPageIndex <= 0) return;
+          accountPageIndex -= 1;
+          renderAccountRows(buildFilteredAccountsList());
+          syncTrackedThFilterButtons();
+        });
+      }
+      if (next) {
+        next.addEventListener('click', () => {
+          const fullList = buildFilteredAccountsList();
+          const pageSize = getPageSizeLimit();
+          const total = fullList.length;
+          const pages = total === 0 ? 0 : Math.ceil(total / pageSize);
+          if (pages === 0 || accountPageIndex >= pages - 1) return;
+          accountPageIndex += 1;
+          renderAccountRows(fullList);
+          syncTrackedThFilterButtons();
+        });
+      }
+    }
+
+    if (accountPageSizeEl) {
+      accountPageSizeEl.addEventListener('change', () => {
+        accountPageIndex = 0;
+        renderAccountRows(buildFilteredAccountsList());
+        syncTrackedThFilterButtons();
+      });
+    }
+
+    const filterResetBtn = document.getElementById('filterResetBtn');
+    if (filterResetBtn) {
+      filterResetBtn.addEventListener('click', () => {
+        const u = document.getElementById('filterUsername');
+        if (u) u.value = '';
+        ['filterLevelMin', 'filterLevelMax', 'filterBountyMin', 'filterBountyMax', 'filterBeliMin', 'filterBeliMax', 'filterFragmentsMin', 'filterFragmentsMax', 'filterLegMin', 'filterLegMax', 'filterMythMin', 'filterMythMax'].forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.value = '';
+        });
+        document.querySelectorAll('.filter-seg-btn[data-filter-group="status"]').forEach((b) => b.classList.remove('is-active'));
+        document.querySelectorAll('.filter-seg-btn[data-filter-group="status"][data-value="all"]').forEach((b) => b.classList.add('is-active'));
+        clearTrackedColumnFiltersUi();
+        refreshTrackedTable();
+      });
+    }
+
+    initTrackedColumnFilters();
+    initAccountPagination();
+    syncTrackedAccountTotal();
+
+    const trackedFilterModalEl = document.getElementById('trackedFilterModal');
+    if (trackedFilterModalEl) trackedFilterModalEl.style.display = 'none';
+
+    if (tbody) {
+      tbody.addEventListener('change', (e) => {
+        const cb = e.target.closest('.acc-row-cb');
+        if (!cb) return;
+        const id = cb.getAttribute('data-account-id');
+        if (!id) return;
+        if (cb.checked) selectedAccountIds.add(id);
+        else selectedAccountIds.delete(id);
+        syncBulkActionsUi();
+      });
+    }
+
+    const selectAllCb = document.getElementById('accountSelectAll');
+    if (selectAllCb) {
+      selectAllCb.addEventListener('change', () => {
+        document.querySelectorAll('#accountTable .acc-row-cb').forEach((cb) => {
+          cb.checked = selectAllCb.checked;
+          const id = cb.getAttribute('data-account-id');
+          if (!id) return;
+          if (selectAllCb.checked) selectedAccountIds.add(id);
+          else selectedAccountIds.delete(id);
+        });
+        syncBulkActionsUi();
+      });
+    }
+
+    document.querySelectorAll('[data-bulk-action]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const action = btn.getAttribute('data-bulk-action');
+        if (action === 'delete') {
+          const ids = [...selectedAccountIds];
+          for (const id of ids) {
+            await apiFetch(`/track-stats/${encodeURIComponent(id)}`, { method: 'DELETE' });
+          }
+          await loadTrackStats();
+          return;
+        }
+        if (action === 'google-sheets') {
+          // Visual-only action for now; backend integration will be added later.
+          return;
+        }
+      });
+    });
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async () => {
+        try {
+          await apiFetch('/auth/logout', { method: 'POST' });
+        } catch (_) {}
+        window.location.replace('login.html');
+      });
+    }
+
+    document.querySelectorAll('.tracked-th-filter-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const col = btn.getAttribute('data-col-filter');
+        openTrackedFilterModal(col, btn);
+      });
+    });
+
+    (function initScrollAndReveal() {
+      const mainScroll = document.getElementById('mainScroll');
+      const header = document.getElementById('mainHeader');
+      if (mainScroll && header) {
+        const onScroll = () => {
+          header.classList.toggle('is-scrolled', mainScroll.scrollTop > 10);
+        };
+        onScroll();
+        mainScroll.addEventListener('scroll', onScroll, { passive: true });
+      }
+      const reduce = prefersReducedMotion();
+      const reveals = document.querySelectorAll('.reveal, .reveal-stagger');
+      if (reduce) {
+        reveals.forEach((el) => el.classList.add('reveal-visible'));
+        return;
+      }
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('reveal-visible');
+            io.unobserve(entry.target);
+          });
+        },
+        { threshold: 0.08, rootMargin: '0px 0px -24px 0px' }
+      );
+      reveals.forEach((el) => io.observe(el));
+    })();
+
+    (async function bootstrapSessionData() {
+      await ensureSession();
+      await loadTrackStats();
+    })();
+
+    (function initPageLoadingEffect() {
+      const activeAnimations = [];
+      let lastPortraitState = null;
+
+      function stagger(stepMs) {
+        return (index) => index * stepMs;
+      }
+
+      function clearRunningAnimations() {
+        while (activeAnimations.length) {
+          const anim = activeAnimations.pop();
+          if (anim && typeof anim.cancel === 'function') anim.cancel();
+        }
+      }
+
+      function createTimeline() {
+        return {
+          add(selector, props, delayStagger) {
+            const nodes = Array.from(document.querySelectorAll(selector));
+            if (nodes.length === 0 || typeof Element.prototype.animate !== 'function') return this;
+            clearRunningAnimations();
+            const yArr = Array.isArray(props?.y) ? props.y : [0, 0, 0];
+            const xArr = Array.isArray(props?.x) ? props.x : [0, 0, 0];
+            const duration = 1550;
+            nodes.forEach((node, index) => {
+              const delay = typeof delayStagger === 'function' ? delayStagger(index) : 0;
+              const anim = node.animate(
+                [
+                  { transform: `translate(${xArr[0] ?? 0}px, ${yArr[0] ?? 0}px)` },
+                  { transform: `translate(${xArr[1] ?? xArr[0] ?? 0}px, ${yArr[1] ?? yArr[0] ?? 0}px)` },
+                  { transform: `translate(${xArr[2] ?? xArr[0] ?? 0}px, ${yArr[2] ?? yArr[0] ?? 0}px)` }
+                ],
+                {
+                  duration,
+                  delay,
+                  iterations: Infinity,
+                  easing: 'ease-in-out'
+                }
+              );
+              activeAnimations.push(anim);
+            });
+            return this;
+          }
+        };
+      }
+
+      function createScope({ mediaQueries }) {
+        return {
+          add(run) {
+            const evaluate = () => {
+              const matches = {};
+              Object.entries(mediaQueries || {}).forEach(([key, query]) => {
+                matches[key] = window.matchMedia(query).matches;
+              });
+              run({ matches });
+            };
+            evaluate();
+            window.addEventListener('resize', evaluate, { passive: true });
+          }
+        };
+      }
+
+      createScope({
+        mediaQueries: {
+          portrait: '(orientation: portrait)'
+        }
+      }).add(({ matches }) => {
+        const isPortrait = matches.portrait;
+        if (lastPortraitState === isPortrait) return;
+        lastPortraitState = isPortrait;
+        createTimeline().add(
+          '.circle',
+          {
+            y: isPortrait ? [-10, 10, -10] : [-14, 14, -14],
+            x: 0
+          },
+          stagger(100)
+        );
+      });
+
+      const loader = document.getElementById('pageLoader');
+      const hideLoader = () => {
+        if (!loader) return;
+        loader.classList.add('is-hidden');
+        window.setTimeout(() => {
+          clearRunningAnimations();
+          loader.remove();
+        }, 460);
+      };
+      window.addEventListener('load', () => window.setTimeout(hideLoader, 500), { once: true });
+      window.setTimeout(hideLoader, 2600);
+    })();
+  </script>
+</body>
+</html>

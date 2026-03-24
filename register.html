@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - Blox Stats</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="app-body min-h-screen text-slate-100">
+  <main class="min-h-screen flex items-center justify-center p-4">
+    <section class="w-full max-w-md rounded-2xl border border-white/10 bg-slate-950/75 p-6 shadow-2xl">
+      <h1 class="text-2xl font-bold text-white">Register</h1>
+      <p class="mt-1 text-sm text-slate-400">Create an account to use Track Stats.</p>
+
+      <form id="registerForm" class="mt-6 space-y-4">
+        <label class="block">
+          <span class="mb-1 block text-sm text-slate-300">Username</span>
+          <input id="username" required minlength="3" maxlength="32" class="w-full rounded-lg border border-white/15 bg-slate-900/80 px-3 py-2 text-white outline-none focus:border-cyan-400" />
+        </label>
+        <label class="block">
+          <span class="mb-1 block text-sm text-slate-300">Password</span>
+          <input id="password" type="password" required minlength="8" maxlength="72" class="w-full rounded-lg border border-white/15 bg-slate-900/80 px-3 py-2 text-white outline-none focus:border-cyan-400" />
+        </label>
+        <p id="error" class="hidden text-sm text-rose-400"></p>
+        <button type="submit" class="w-full rounded-lg border border-cyan-400/40 bg-cyan-500/15 px-4 py-2.5 font-semibold text-cyan-300 hover:bg-cyan-500/25">Create account</button>
+      </form>
+
+      <p class="mt-4 text-sm text-slate-400">
+        Have an account?
+        <a href="login.html" class="text-cyan-300 hover:text-cyan-200">Login</a>
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const API_BASE = "http://localhost:4000/api";
+
+    async function checkAlreadyLoggedIn() {
+      try {
+        const res = await fetch(`${API_BASE}/auth/me`, { credentials: "include" });
+        if (res.ok) window.location.replace("index.html");
+      } catch (_) {}
+    }
+
+    checkAlreadyLoggedIn();
+
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const errorEl = document.getElementById("error");
+      errorEl.classList.add("hidden");
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ username, password }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || "Register failed");
+        window.location.replace("index.html");
+      } catch (err) {
+        errorEl.textContent = err.message || "Register failed";
+        errorEl.classList.remove("hidden");
+      }
+    });
+  </script>
+</body>
+</html>
