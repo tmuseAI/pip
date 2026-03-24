@@ -834,6 +834,8 @@
     </div>
   </div>
 
+  <script src="animation-utils.js"></script>
+  <script src="viewport-observer.js"></script>
   <script src="app.js"></script>
   <script>
     const prefersReducedMotion = () =>
@@ -1222,7 +1224,24 @@
       }
     }
 
+    function renderTableSkeleton(rows = 8) {
+      if (!tbody) return;
+      const skeletonRows = [];
+      for (let i = 0; i < rows; i += 1) {
+        skeletonRows.push(`
+          <tr class="skeleton-row">
+            <td colspan="12">
+              <span class="skeleton-line" style="width: 38%;"></span>
+              <span class="skeleton-line" style="width: 64%;"></span>
+            </td>
+          </tr>
+        `);
+      }
+      tbody.innerHTML = skeletonRows.join('');
+    }
+
     async function loadTrackStats() {
+      renderTableSkeleton(window.AppPerf?.ANIMATION_LEVEL === 'low' ? 5 : 8);
       try {
         const payload = await apiFetch('/track-stats', { method: 'GET' });
         accounts = Array.isArray(payload?.data) ? payload.data : [];
@@ -1942,29 +1961,44 @@
       const mainScroll = document.getElementById('mainScroll');
       const header = document.getElementById('mainHeader');
       if (mainScroll && header) {
+        let ticking = false;
         const onScroll = () => {
-          header.classList.toggle('is-scrolled', mainScroll.scrollTop > 10);
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(() => {
+            ticking = false;
+            header.classList.toggle('is-scrolled', mainScroll.scrollTop > 10);
+          });
         };
         onScroll();
         mainScroll.addEventListener('scroll', onScroll, { passive: true });
       }
-      const reduce = prefersReducedMotion();
-      const reveals = document.querySelectorAll('.reveal, .reveal-stagger');
-      if (reduce) {
-        reveals.forEach((el) => el.classList.add('reveal-visible'));
-        return;
+
+      if (window.ViewportObserver?.observeReveal) {
+        window.ViewportObserver.observeReveal({
+          selector: '.reveal, .reveal-stagger',
+          threshold: 0.08,
+          rootMargin: '0px 0px -24px 0px'
+        });
+      } else {
+        const reduce = prefersReducedMotion();
+        const reveals = document.querySelectorAll('.reveal, .reveal-stagger');
+        if (reduce) {
+          reveals.forEach((el) => el.classList.add('reveal-visible'));
+          return;
+        }
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add('reveal-visible');
+              io.unobserve(entry.target);
+            });
+          },
+          { threshold: 0.08, rootMargin: '0px 0px -24px 0px' }
+        );
+        reveals.forEach((el) => io.observe(el));
       }
-      const io = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            entry.target.classList.add('reveal-visible');
-            io.unobserve(entry.target);
-          });
-        },
-        { threshold: 0.08, rootMargin: '0px 0px -24px 0px' }
-      );
-      reveals.forEach((el) => io.observe(el));
     })();
 
     (async function bootstrapSessionData() {
