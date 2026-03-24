@@ -9,8 +9,14 @@ declare global {
 export const prisma =
   global.__prisma ??
   new PrismaClient({
-    log: ["error", "warn"],
+    log: [{ emit: "event", level: "query" }, "error", "warn"],
   });
+
+if (process.env.DEBUG_AUTH === "true") {
+  (prisma as any).$on("query", (e: any) => {
+    console.log("PRISMA QUERY:", e.query, e.params);
+  });
+}
 
 if (process.env.NODE_ENV !== "production") {
   global.__prisma = prisma;

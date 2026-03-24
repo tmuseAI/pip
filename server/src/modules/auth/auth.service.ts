@@ -27,12 +27,16 @@ export class AuthService {
   }
 
   async register(email: string, password: string) {
+    console.log("REGISTER service input:", { email, hasPassword: Boolean(password) });
+    console.log("REGISTER service query: findUserByEmail");
     const existing = await this.repo.findUserByEmail(email);
     if (existing) throw new AppError(409, "Email already exists");
 
     const hashed = await hashPassword(password);
+    console.log("REGISTER service query: createUser");
     const user = await this.repo.createUser(email, hashed, "USER");
     const tokens = this.buildTokenPair(user.id, user.role);
+    console.log("REGISTER service query: createRefreshToken");
     await this.repo.createRefreshToken(user.id, hashToken(tokens.refreshToken), this.getRefreshExpiry());
 
     return {

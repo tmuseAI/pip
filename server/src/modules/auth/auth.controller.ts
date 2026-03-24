@@ -25,11 +25,17 @@ export class AuthController {
 
   register = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const payload = registerSchema.parse(req.body);
+      console.log("REGISTER req.body:", req.body);
+      const { email, password } = req.body ?? {};
+      if (!email || !password) {
+        return res.status(400).json({ success: false, message: "Missing fields" });
+      }
+      const payload = registerSchema.parse({ email, password });
       const data = await this.service.register(payload.email, payload.password);
       this.setRefreshCookie(res, data.refreshToken);
       return res.status(201).json({ success: true, user: data.user, accessToken: data.accessToken, refreshToken: data.refreshToken });
     } catch (error) {
+      console.log(error);
       console.error("REGISTER ERROR:", error);
       return next(error);
     }

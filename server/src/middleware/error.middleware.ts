@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
+import { Prisma } from "@prisma/client";
 import { AppError, fail } from "../utils/http";
 import { logger } from "../utils/logger";
 
@@ -14,6 +15,17 @@ export function errorMiddleware(err: unknown, _req: Request, res: Response, _nex
 
   if (err instanceof AppError) {
     return res.status(err.statusCode).json(fail(err.message, err.details));
+  }
+
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    if (err.code === "P2002") {
+      return res.status(409).json(fail("Email already exists"));
+    }
+    if (err.code === "P2022") {
+      return res
+        .status(500)
+        .json(fail("Database schema is out of sync. Run prisma migrate before using auth APIs."));
+    }
   }
 
   logger.error({ err }, "Unhandled server error");
