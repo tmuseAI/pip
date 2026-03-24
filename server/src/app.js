@@ -11,6 +11,10 @@ const trackStatRoutes = require("./routes/trackStatRoutes");
 
 const app = express();
 const PgSessionStore = connectPgSimple(session);
+const allowedOrigins = String(env.frontendOrigin || "")
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
 const pgPool = new pg.Pool({
   connectionString: env.databaseUrl,
   ssl: env.databaseUrl.includes("sslmode=require") ? { rejectUnauthorized: false } : false,
@@ -28,7 +32,7 @@ app.use(
   cors({
     origin(origin, callback) {
       if (!origin || origin === "null") return callback(null, true);
-      if (origin === env.frontendOrigin) return callback(null, true);
+      if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) return callback(null, true);
       return callback(new Error("CORS blocked for this origin"));
     },
     credentials: true,

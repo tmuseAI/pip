@@ -15,7 +15,7 @@ const env = {
   port: Number(process.env.PORT || 4000),
   databaseUrl: required("DATABASE_URL"),
   sessionSecret: required("SESSION_SECRET"),
-  frontendOrigin: process.env.FRONTEND_ORIGIN || "http://127.0.0.1:5500",
+  frontendOrigin: process.env.FRONTEND_ORIGIN || "",
   cookieSecure: process.env.COOKIE_SECURE === "true",
 };
 

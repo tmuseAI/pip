@@ -30,6 +30,15 @@ function validateCredentials(username, password) {
 
 router.use(authLimiter);
 
+function saveSession(req) {
+  return new Promise((resolve, reject) => {
+    req.session.save((err) => {
+      if (err) return reject(err);
+      return resolve();
+    });
+  });
+}
+
 router.post("/register", async (req, res) => {
   const username = normalizeUsername(req.body?.username);
   const password = String(req.body?.password || "");
@@ -47,6 +56,7 @@ router.post("/register", async (req, res) => {
     select: { id: true, username: true },
   });
   req.session.userId = String(user.id);
+  await saveSession(req);
   return res.status(201).json({ user: { id: String(user.id), username: user.username } });
 });
 
@@ -67,6 +77,7 @@ router.post("/login", async (req, res) => {
   }
 
   req.session.userId = String(user.id);
+  await saveSession(req);
   return res.json({ user: { id: String(user.id), username: user.username } });
 });
 
