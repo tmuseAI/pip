@@ -1,6 +1,4 @@
----
 deployment:
   tasks:
-    - export DEPLOYPATH=$HOME/public_html/pip
-    - /bin/mkdir -p "$DEPLOYPATH"
-    - /usr/bin/rsync -av --delete --exclude ".git/" --exclude "node_modules/" ./ "$DEPLOYPATH/"
+    - export DEPLOYPATH=/home/bykkrsite0/public_html/
+    - /bin/cp -R * $DEPLOYPATH
