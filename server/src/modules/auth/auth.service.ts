@@ -27,7 +27,7 @@ export class AuthService {
   }
 
   async register(email: string, password: string) {
-    console.log("REGISTER service input:", { email, hasPassword: Boolean(password) });
+    console.log("REGISTER INPUT:", email, password);
     console.log("REGISTER service query: findUserByEmail");
     const existing = await this.repo.findUserByEmail(email);
     if (existing) throw new AppError(409, "Email already exists");
