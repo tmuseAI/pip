@@ -90,6 +90,22 @@ export class AuthService {
     };
   }
 
+  async meFromRefreshToken(refreshToken: string) {
+    let payload;
+    try {
+      payload = verifyToken(refreshToken, "refresh");
+    } catch {
+      throw new AppError(401, "Unauthorized");
+    }
+    const storedToken = await this.repo.findRefreshToken(hashToken(refreshToken));
+    if (!storedToken || storedToken.revoked || storedToken.expiresAt.getTime() <= Date.now()) {
+      throw new AppError(401, "Unauthorized");
+    }
+    const user = await this.repo.findUserById(payload.sub);
+    if (!user) throw new AppError(401, "Unauthorized");
+    return { id: user.id, email: user.email, role: user.role, isVerified: user.isVerified };
+  }
+
   async logout(refreshToken: string) {
     try {
       verifyToken(refreshToken, "refresh");

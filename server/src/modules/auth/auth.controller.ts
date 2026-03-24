@@ -3,6 +3,7 @@ import { env, isProduction } from "../../config/env";
 import { ok } from "../../utils/http";
 import { AuthService } from "./auth.service";
 import { loginSchema, logoutSchema, refreshSchema, registerSchema } from "./auth.validation";
+import { verifyToken } from "../../utils/jwt";
 
 export class AuthController {
   constructor(private readonly service: AuthService) {}
@@ -27,8 +28,9 @@ export class AuthController {
       const payload = registerSchema.parse(req.body);
       const data = await this.service.register(payload.email, payload.password);
       this.setRefreshCookie(res, data.refreshToken);
-      return res.status(201).json(ok({ user: data.user, accessToken: data.accessToken, refreshToken: data.refreshToken }));
+      return res.status(201).json({ success: true, user: data.user, accessToken: data.accessToken, refreshToken: data.refreshToken });
     } catch (error) {
+      console.error("REGISTER ERROR:", error);
       return next(error);
     }
   };
@@ -38,8 +40,9 @@ export class AuthController {
       const payload = loginSchema.parse(req.body);
       const data = await this.service.login(payload.email, payload.password);
       this.setRefreshCookie(res, data.refreshToken);
-      return res.json(ok({ user: data.user, accessToken: data.accessToken, refreshToken: data.refreshToken }));
+      return res.json({ success: true, user: data.user, accessToken: data.accessToken, refreshToken: data.refreshToken });
     } catch (error) {
+      console.error("LOGIN ERROR:", error);
       return next(error);
     }
   };
@@ -51,7 +54,27 @@ export class AuthController {
       const payload = refreshSchema.parse({ refreshToken: bodyToken || cookieToken });
       const data = await this.service.refresh(payload.refreshToken);
       this.setRefreshCookie(res, data.refreshToken);
-      return res.json(ok({ user: data.user, accessToken: data.accessToken, refreshToken: data.refreshToken }));
+      return res.json({ success: true, user: data.user, accessToken: data.accessToken, refreshToken: data.refreshToken });
+    } catch (error) {
+      console.error("REFRESH ERROR:", error);
+      return next(error);
+    }
+  };
+
+  me = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const bearer = authHeader && authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+      if (bearer) {
+        const payload = verifyToken(bearer, "access");
+        return res.json(ok({ user: { id: payload.sub, role: payload.role } }));
+      }
+      const refreshToken = req.cookies?.refreshToken;
+      if (!refreshToken) {
+        return res.status(401).json({ success: false, error: "Unauthorized" });
+      }
+      const user = await this.service.meFromRefreshToken(refreshToken);
+      return res.json(ok({ user }));
     } catch (error) {
       return next(error);
     }
@@ -66,6 +89,7 @@ export class AuthController {
       this.clearRefreshCookie(res);
       return res.json(ok(data));
     } catch (error) {
+      console.error("LOGOUT ERROR:", error);
       return next(error);
     }
   };

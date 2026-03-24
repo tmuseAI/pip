@@ -30,6 +30,7 @@ app.use(pinoHttp({ logger }));
 app.get("/api/health", (_req, res) => res.json(ok({ status: "ok" })));
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+app.use("/auth", authRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

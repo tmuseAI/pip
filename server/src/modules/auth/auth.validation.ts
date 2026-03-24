@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const emailSchema = z.email().transform((v) => v.trim().toLowerCase());
+const emailSchema = z.string().trim().toLowerCase().email("Invalid email format");
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters").max(72);
 
 export const registerSchema = z.object({

@@ -1204,7 +1204,8 @@
         let msg = 'Request failed';
         try {
           const body = await res.json();
-          if (body?.error) msg = body.error;
+          if (typeof body?.error === 'string') msg = body.error;
+          else if (body?.error?.message) msg = body.error.message;
         } catch (_) {}
         const err = new Error(msg);
         err.status = res.status;
@@ -1218,7 +1219,8 @@
       try {
         const data = await apiFetch('/auth/me', { method: 'GET' });
         const usernameNode = document.querySelector('.profile-card .text-sm.font-bold');
-        if (usernameNode && data?.user?.username) usernameNode.textContent = data.user.username;
+        const user = data?.data?.user || data?.user || null;
+        if (usernameNode && user) usernameNode.textContent = user.email || user.username || 'User';
       } catch (_) {
         window.location.replace('login.html');
       }
